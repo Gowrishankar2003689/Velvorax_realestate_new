@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+    /* Container that holds both the image card and the text */
+.about-container {
+  display: flex;            /* Turns on Flexbox layout */
+  align-items: center;      /* Centers items vertically relative to each other */
+  justify-content: center;  /* Centers the whole block horizontally on screen */
+  gap: 40px;                /* Adds a clean space between the image and the text */
+  max-width: 1200px;        /* Limits the width so it doesn't stretch too wide */
+  margin: 0 auto;           /* Centers the container on the webpage */
+  padding: 40px 20px;
+}
+
+/* Controls the width of the Left Side (Image Card) */
+.about-image-card {
+  flex: 1;                  /* Takes up equal horizontal space */
+  max-width: 500px;         /* Limits how large the image card can get */
+}
+
+.about-image-card img {
+  width: 100%;
+  height: 450px;            /* Fixed height to force cropping */
+  object-fit: cover;        /* Scales image to fill while maintaining aspect ratio */
+  object-position: top;     /* Keeps the top part of the image visible, crops bottom */
+  border-radius: 24px;
+  transform: scale(1.5);    /* Very low zoom */
+  box-shadow: 0 30px 70px rgba(0,0,0,0.6);
+}
+
+/* Controls the width of the Right Side (Text) */
+.about-content {
+  flex: 1;                  /* Takes up equal horizontal space */
+  max-width: 500px;
+  color: #ffffff;           /* Assuming a dark theme like your screenshot */
+  text-align: left;         /* Aligns text beautifully to the left */
+ padding-top:1px;
+}
+
+
+/* Styling the typography to make it look clean */
+.section-title {
+  color:#FFD700;          /* Accent color for 'About Velvorax' */
+  font-size:50px;
+
+  text-transform: uppercase;
+}
+
+.section-subtitle {
+  font-size: 1.8rem;
+ margin-top: 10px;
+  font-weight: 600;
+}
+
+.section-description {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #cccccc;           /* Slightly lighter text color for better readability */
+}
+
+/* RESPONSIVE DESIGN: Crucial for mobile phones! */
+@media (max-width: 768px) {
+  .about-container {
+    flex-direction: column; /* Stacks vertically on smaller mobile screens */
+    text-align: center;
+  }
+  .about-content {
+    text-align: center;     /* Centers the text on mobile for better aesthetics */
+  }
+}
+
+/* Master container split into 2 sections: Left (What we do) and Right (Vision/Mission) */
+.main-container {
+    display: flex;
+    max-width: 1200px;
+    width: 100%;
+    gap: 50px;
+}
+
+/* Shared titles styling */
+.section-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+/* LEFT SECTION STYLING */
+.what-we-do-section {
+    flex: 1.8; /* Takes up more width */
+}
+
+.section-subtitle {
+    font-size: 14px;
+    color: #b0b5c1;
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+/* Core Container Split layout */
+.main-container {
+    display: flex;
+    max-width: 1280px;
+    width: 100%;
+    gap: 40px;
+    align-items: flex-start;
+}
+
+/* ==================== TYPOGRAPHY & TITLES ==================== */
+.section-title {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #FFD700 0%, #a5b4fc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.title-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background-color: #6366f1;
+    border-radius: 50%;
+    margin-left: 6px;
+}
+
+.section-subtitle {
+    font-size: 15px;
+    color: #94a3b8;
+    margin-bottom: 35px;
+    line-height: 1.6;
+    max-width: 650px;
+}
+
+/* ==================== ADVANCED CARDS GRID ==================== */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* Clean 5-column layout desktop layout */
+    gap: 16px;
+    margin-bottom: 30px;
+}
+
+/* Base Card Styling with Glassmorphism */
+.card {
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 25px 16px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    backdrop-filter: blur(8px);
+}
+
+/* Subtle inner glow overlay for each card */
+.card-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.card h3, .card p, .card .icon-box {
+    position: relative;
+    z-index: 2; /* Keeps text layered above glowing elements */
+}
+
+.card .icon-box i {
+    font-size: 26px;
+    margin-bottom: 18px;
+    transition: transform 0.4s ease;
+}
+
+.card h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #ffffff;
+    line-height: 1.4;
+    min-height: 40px;
+}
+
+.card p {
+    font-size: 11.5px;
+    color: #94a3b8;
+    line-height: 1.5;
+}
+
+/* Lift card up slightly on hover */
+.card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+}
+
+.card:hover .icon-box i {
+    transform: scale(1.15);
+}
+
+.card:hover .card-glow {
+    opacity: 0.12;
+}
+
+/* ==================== COLOR THEMES FOR CARDS ==================== */
+/* Cyan Theme */
+.card-cyan:hover { border-color: #06b6d4; }
+.card-cyan .icon-box i { color: #06b6d4; }
+.card-cyan .card-glow { background: radial-gradient(circle at center, #06b6d4 0%, transparent 70%); }
+
+/* Purple Theme */
+.card-purple:hover { border-color: #a855f7; }
+.card-purple .icon-box i { color: #a855f7; }
+.card-purple .card-glow { background: radial-gradient(circle at center, #a855f7 0%, transparent 70%); }
+
+/* Pink Theme */
+.card-pink:hover { border-color: #ec4899; }
+.card-pink .icon-box i { color: #ec4899; }
+.card-pink .card-glow { background: radial-gradient(circle at center, #ec4899 0%, transparent 70%); }
+
+/* Orange Theme */
+.card-orange:hover { border-color: #f97316; }
+.card-orange .icon-box i { color: #f97316; }
+.card-orange .card-glow { background: radial-gradient(circle at center, #f97316 0%, transparent 70%); }
+
+/* Green Theme */
+.card-green:hover { border-color: #10b981; }
+.card-green .icon-box i { color: #10b981; }
+.card-green .card-glow { background: radial-gradient(circle at center, #10b981 0%, transparent 70%); }
+
+
+/* ==================== ADVANCED FEATURE BOTTOM BAR ==================== */
+.feature-bar {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 100px;
+    padding: 16px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    backdrop-filter: blur(10px);
+}
+
+.feat-item {
+    font-size: 13px;
+    font-weight: 500;
+    color: #cbd5e1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.feat-item i {
+    font-size: 14px;
+}
+
+.divider {
+    width: 1px;
+    height: 16px;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Color classes for bar icons */
+.text-cyan { color: #06b6d4; }
+.text-purple { color: #a855f7; }
+.text-pink { color: #ec4899; }
+.text-orange { color: #f97316; }
+
+
+/* ==================== RIGHT SIDE: VISION & MISSION ==================== */
+.what-we-do-section { flex: 1.7; }
+.vision-mission-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Glass panel structure container */
+.glass-panel {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.4) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 24px;
+    padding: 30px;
+    transition: border-color 0.3s ease;
+}
+
+.glass-panel:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.side-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #ffffff;
+    letter-spacing: -0.3px;
+}
+
+.vision-content {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.vision-content p {
+    font-size: 13.5px;
+    color: #94a3b8;
+    line-height: 1.6;
+}
+
+/* Advanced Glowing Circle Gradients */
+.gradient-circle {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.gradient-circle i {
+    font-size: 24px;
+    color: #0a0d16; /* Dark pop contrast against vibrant circles */
+}
+
+/* Gold/Orange Fluid Gradient */
+.circle-gold {
+    background: linear-gradient(135deg, #fbbf24 0%, #f97316 100%);
+    box-shadow: 0 0 20px rgba(249, 115, 22, 0.2);
+}
+
+/* Magenta/Purple Fluid Gradient */
+.circle-magenta {
+    background: linear-gradient(135deg, #f472b6 0%, #a855f7 100%);
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.2);
+}
+
+
+/* ==================== JAVASCRIPT ANIMATION EFFECTS ==================== */
+.fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+/* ==================== RESPONSIVE WORK FOR TABLETS/MOBILES ==================== */
+@media (max-width: 1024px) {
+    .main-container {
+        flex-direction: column;
+        gap: 50px;
+    }
+    .cards-grid {
+        grid-template-columns: repeat(3, 1fr); /* 3 cards a line on tablets */
+    }
+}
+
+@media (max-width: 640px) {
+    .cards-grid {
+        grid-template-columns: repeat(1, 1fr); /* Stack single card on compact mobile */
+    }
+    .feature-bar {
+        flex-direction: column;
+        border-radius: 20px;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    .divider {
+        display: none;
+    }
+    .vision-content {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+/* ==================== GLOBAL LAYOUT WRAPPER ==================== */
+.page-wrapper {
+    width: 100%;
+    max-width: 1240px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 70px;
+}
+
+/* ==================== WHY VELVORAX STYLING ==================== */
+.why-velvorax {
+    text-align: center;
+    position: relative;
+}
+
+.main-title {
+    font-size: 30px;
+    font-weight: 700;
+    margin-bottom: 40px;
+    color: #ffffff;
+    letter-spacing: -0.5px;
+}
+
+.title-glow-line {
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #f97316, #ec4899);
+    margin: 8px auto 0 auto;
+    border-radius: 2px;
+}
+
+/* 5 Column Grid Setup */
+.grid-5-columns {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+}
+
+/* Base Glassmorphic Neon Card Structure */
+.v-card {
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 18px;
+    padding: 30px 20px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    backdrop-filter: blur(12px);
+}
+
+.glow-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.v-icon-wrap, .v-card h3, .v-card p {
+    position: relative;
+    z-index: 2;
+}
+
+.v-icon-wrap i {
+    font-size: 30px;
+    margin-bottom: 20px;
+    transition: transform 0.3s ease;
+}
+
+.v-card h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #ffffff;
+    line-height: 1.4;
+    min-height: 40px;
+}
+
+.v-card p {
+    font-size: 11.5px;
+    color: #94a3b8;
+    line-height: 1.6;
+}
+
+/* Hover Physics */
+.v-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+}
+
+.v-card:hover .v-icon-wrap i {
+    transform: scale(1.15) rotate(3deg);
+}
+
+.v-card:hover .glow-layer {
+    opacity: 0.15;
+}
+
+/* --- CARDS INDIVIDUAL NEON COLOR TOKENS --- */
+/* Card 1: Red/Orange */
+.neon-red:hover { border-color: #ef4444; }
+.neon-red i { color: #ef4444; }
+.neon-red .glow-layer { background: radial-gradient(circle at center, #ef4444 0%, transparent 70%); }
+
+/* Card 2: Blue */
+.neon-blue:hover { border-color: #3b82f6; }
+.neon-blue i { color: #3b82f6; }
+.neon-blue .glow-layer { background: radial-gradient(circle at center, #3b82f6 0%, transparent 70%); }
+
+/* Card 3: Purple */
+.neon-purple:hover { border-color: #a855f7; }
+.neon-purple i { color: #a855f7; }
+.neon-purple .glow-layer { background: radial-gradient(circle at center, #a855f7 0%, transparent 70%); }
+
+/* Card 4: Teal */
+.neon-teal:hover { border-color: #0d9488; }
+.neon-teal i { color: #0d9488; }
+.neon-teal .glow-layer { background: radial-gradient(circle at center, #0d9488 0%, transparent 70%); }
+
+/* Card 5: Amber */
+.neon-amber:hover { border-color: #f59e0b; }
+.neon-amber i { color: #f59e0b; }
+.neon-amber .glow-layer { background: radial-gradient(circle at center, #f59e0b 0%, transparent 70%); }
+
+
+/* ==================== BOTTOM TWO-COLUMN ROW LAYOUT ==================== */
+.bottom-row-container {
+    display: flex;
+    gap: 40px;
+    align-items: stretch;
+}
+
+.sub-title {
+    font-size: 22px;
+    color: #ffffff;
+    margin-bottom: 45px;
+    font-weight: 600;
+}
+
+/* --- OUR APPROACH TIMELINE STYLING (Left Column) --- */
+.our-approach {
+    flex: 1.6;
+}
+
+.timeline-container {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    padding-top: 10px;
+}
+
+/* Modern continuous structural background tracks */
+.timeline-progress-line {
+    position: absolute;
+    top: 36px;
+    left: 5%;
+    right: 5%;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.08);
+    z-index: 1;
+}
+
+.line-fill {
+    width: 0%; /* Incremented via JavaScript intersection tracking */
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #ec4899, #f59e0b);
+    transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.timeline-node {
+    flex: 1;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    padding: 0 8px;
+}
+
+/* Geometric circular nodes */
+.node-circle {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    margin: 0 auto 25px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #0a0d16;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    position: relative;
+    transition: all 0.4s ease;
+}
+
+.node-circle i {
+    font-size: 18px;
+    transition: transform 0.3s ease;
+}
+
+/* Step badges */
+.node-num {
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    font-weight: 700;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #ffffff;
+    background: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.timeline-node h3 {
+    font-size: 14px;
+    color: #ffffff;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.timeline-node p {
+    font-size: 11px;
+    color: #94a3b8;
+    line-height: 1.5;
+}
+
+/* Node circle hover micro-interactions */
+.timeline-node:hover .node-circle {
+    transform: scale(1.1);
+    border-color: #ffffff;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+}
+
+/* Individual node identity accents */
+.circle-blue i { color: #60a5fa; }
+.circle-purple i { color: #c084fc; }
+.circle-pink i { color: #f472b6; }
+.circle-orange i { color: #fb923c; }
+.circle-teal i { color: #2dd4bf; }
+
+/* ==================== NEW EFFECT: SOFT PULSE & GLOW ==================== */
+@keyframes soft-pulse {
+  0% { transform: scale(1.1); filter: brightness(1); }
+  50% { transform: scale(1.12); filter: brightness(1.15); }
+  100% { transform: scale(1.1); filter: brightness(1); }
+}
+
+.pulse-effect {
+  animation: soft-pulse 5s ease-in-out infinite;
+}
+
+/* Floating Animation */
+.about-image-card img {
+  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+
+/* --- OUR IMPACT STYLING (Right Column) --- */
+.our-impact {
+    flex: 1;
+}
+
+/* Premium Gold Gradient Metallic Structural Chassis */
+.luxury-impact-box {
+    background: linear-gradient(145deg, #1e1b15 0%, #0f0e0c 100%);
+    border: 1px solid rgba(212, 163, 89, 0.2);
+    border-radius: 24px;
+    padding: 35px 25px;
+    height: 100%;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    position: relative;
+}
+
+/* Subtle gold corner ambient flare */
+.luxury-impact-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle at top right, rgba(212, 163, 89, 0.12), transparent 70%);
+    pointer-events: none;
+}
+
+.impact-title-header {
+    font-size: 16px;
+    color: #d4a359;
+    margin-bottom: 25px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+/* 2x2 Matrix Structure */
+.premium-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.premium-tile {
+    background: rgba(212, 163, 89, 0.03);
+    border: 1px solid rgba(212, 163, 89, 0.1);
+    border-radius: 14px;
+    padding: 20px 15px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: all 0.3s ease;
+}
+
+.premium-tile:hover {
+    background: rgba(212, 163, 89, 0.06);
+    border-color: rgba(212, 163, 89, 0.3);
+    transform: translateY(-2px);
+}
+
+.tile-icon i {
+    font-size: 22px;
+    color: #d4a359;
+}
+
+.count-number, .static-number {
+    font-size: 22px;
+    color: #ffffff;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+/* Append '+' via pseudo element conditionally */
+.count-number::after {
+    content: '+';
+    font-size: 16px;
+    color: #d4a359;
+    margin-left: 2px;
+}
+
+.premium-tile p {
+    font-size: 11px;
+    color: #a39482;
+    margin-top: 2px;
+}
+
+
+/* ==================== INTERACTION EFFECTS (SCROLL-REVEAL) ==================== */
+.scroll-reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.scroll-reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+/* ==================== SCREEN RESPONSIVE CONSTRAINTS ==================== */
+@media (max-width: 1024px) {
+    .grid-5-columns {
+        grid-template-columns: repeat(3, 1fr); /* Break grid into rows of 3 */
+    }
+    .bottom-row-container {
+        flex-direction: column;
+        gap: 50px;
+    }
+}
+
+@media (max-width: 640px) {
+    .grid-5-columns {
+        grid-template-columns: 1fr; /* Stack single file */
+    }
+    .timeline-container {
+        flex-direction: column;
+        gap: 35px;
+    }
+    .timeline-progress-line {
+        display: none; /* Drop track line layout on vertical stacks */
+    }
+    .timeline-node {
+        display: flex;
+        text-align: left;
+        align-items: center;
+        gap: 20px;
+    }
+    .node-circle {
+        margin: 0;
+    }
+    .premium-stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About - Velvorax Platform</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://unpkg.com/feather-icons"></script>
+  <script src="js/config.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+</head>
+<body class="antialiased bg-[#020205] relative overflow-x-hidden">
+
+<!-- Cosmic Background / Milky Way Effect (3D Depth) -->
+<div class="cosmic-bg fixed inset-0 z-0">
+  <div class="milky-way"></div>
+  <div id="stars"></div>
+  <div id="stars2"></div>
+  <div id="stars3"></div>
+  <div class="nebula-glow"></div>
+</div>
+
+<!-- Navigation (Shared) -->
+<nav class="glass-nav sticky top-0 z-50 w-full">
+  <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-20">
+      <a href="index.html" class="flex-shrink-0 flex items-center group">
+        <img src="assets/logo.jpg" alt="Velvorax Logo" class="high-res-logo rounded-full object-cover aspect-square h-12 object-contain mr-3 group-hover:scale-105 transition-transform">
+        <div class="hidden sm:block">
+          <h1 class="text-2xl font-bold text-yellow-400 tracking-wider leading-none">Velvorax</h1>
+          <p class="text-[0.6rem] text-gray-400 tracking-[0.2em] uppercase mt-1">Software Solution</p>
+        </div>
+      </a>
+      <div class="hidden md:flex space-x-8">
+        <a href="index.html" class="text-gray-300 hover:text-white transition">Home</a>
+        <a href="features.html" class="text-gray-300 hover:text-white transition">Features</a>
+        <a href="services.html" class="text-gray-300 hover:text-white transition">Our Services</a>
+        <a href="pricing.html" class="text-gray-300 hover:text-white transition">Pricing</a>
+        <a href="partner.html" class="text-gray-300 hover:text-white transition">Partner Program</a>
+        <a href="about.html" class="text-yellow-400 border-b-2 border-yellow-400 pb-1">About</a>
+      </div>
+      <div class="hidden md:flex items-center space-x-4">
+        <a href="login.html" class="btn-primary-theme">Login</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="py-24 relative z-10">
+  <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <!-- Founder Section (Minimalist Landscape) -->
+    <div class="relative group w-full">
+      <!-- Background Glow -->
+      <div class="absolute -inset-8 bg-yellow-400/5 rounded-[3rem] blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+
+      <!-- Image Portrait/Original optimized -->
+      <div class="relative overflow-hidden rounded-3xl shadow-2xl shadow-yellow-500/30 border border-white/20 bg-gradient-to-br from-[#1a1a2e] via-[#0d0d1f] to-[#050510]">
+        <section class="about-section">
+          <div class="about-container">
+            <div class="about-content">
+              <h3 class="section-title">About Velvorax</h3>
+              <h4 class="section-subtitle">Smart Automation. Better Relationships.Faster Growth.</h4>
+              <p class="section-description">
+                Our vision is to transform businesses through AI-powered CRM technology that increases productivity, improves customer relationships, automates workflows, and drives real-time business growth.
+              </p>
+              <br>
+              <div class="mt-10">
+                <h3 class="text-3xl font-bold text-white tracking-tight">Vagga Raraju</h3>
+                <p class="text-yellow-500 font-medium uppercase tracking-[0.3em] text-sm mt-3">founder & CEO</p>
+              </div>
+            </div>
+            <div class="about-image-card">
+              <img src="assets/about.jpg" alt="Velvorax Software Solutions Card" class="pulse-effect">
+            </div>
+
+          </div>
+        </section>
+      </div>
+      <br>
+      <section class="main-container">
+
+        <div class="what-we-do-section fade-in">
+          <h2 class="section-title">What We Do<span class="title-dot"></span></h2>
+          <p class="section-subtitle">
+            We provide end-to-end digital solutions that help businesses attract, engage, convert, and retain more customers.
+          </p>
+
+          <div class="cards-grid">
+            <div class="card card-cyan">
+              <div class="icon-box"><i class="fa-solid fa-code"></i></div>
+              <h3>Website Development</h3>
+              <p>High performing websites that build your brand and generate leads.</p>
+              <div class="card-glow"></div>
+            </div>
+
+            <div class="card card-purple">
+              <div class="icon-box"><i class="fa-solid fa-mobile-screen-button"></i></div>
+              <h3>Mobile App Development</h3>
+              <p>Custom solutions designed for an enhanced user experience.</p>
+              <div class="card-glow"></div>
+            </div>
+
+            <div class="card card-pink">
+              <div class="icon-box"><i class="fa-solid fa-users-gear"></i></div>
+              <h3>CRM & Sales Automation</h3>
+              <p>Automate sales, track leads, and close deals faster.</p>
+              <div class="card-glow"></div>
+            </div>
+
+            <div class="card card-orange">
+              <div class="icon-box"><i class="fa-solid fa-bullhorn"></i></div>
+              <h3>Digital Marketing</h3>
+              <p>Drive targeted traffic, generate quality leads, and grow sales.</p>
+              <div class="card-glow"></div>
+            </div>
+
+            <div class="card card-green">
+              <div class="icon-box"><i class="fa-solid fa-gears"></i></div>
+              <h3>Process Automation</h3>
+              <p>Eliminate manual effort and automate your business processes.</p>
+              <div class="card-glow"></div>
+            </div>
+          </div>
+
+          <div class="feature-bar">
+            <span class="feat-item"><i class="fa-solid fa-user-plus text-cyan"></i> Meet Leads</span>
+            <span class="divider"></span>
+            <span class="feat-item"><i class="fa-solid fa-paper-plane text-purple"></i> Better Relationships</span>
+            <span class="divider"></span>
+            <span class="feat-item"><i class="fa-solid fa-chart-line text-pink"></i> Higher Conversions</span>
+            <span class="divider"></span>
+            <span class="feat-item"><i class="fa-solid fa-users text-orange"></i> Business Growth</span>
+          </div>
+        </div>
+
+        <div class="vision-mission-section fade-in">
+
+          <div class="vision-card glass-panel">
+            <h2 class="side-title">Our Vision</h2>
+            <div class="vision-content">
+              <div class="gradient-circle circle-gold floating-effect">
+                <i class="fa-solid fa-eye"></i>
+              </div>
+              <p>To empower every small and medium business with enterprise-level systems and automation so they can compete, grow, and succeed in a rapidly evolving digital world.</p>
+            </div>
+          </div>
+
+          <div class="vision-card glass-panel">
+            <h2 class="side-title">Our Mission</h2>
+            <div class="vision-content">
+              <div class="gradient-circle circle-magenta floating-effect">
+                <i class="fa-solid fa-bullseye"></i>
+              </div>
+              <p>To build a complete growth ecosystem that combines leads, sales, customers, and automation in one powerful platform so businesses can grow smarter and faster.</p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <script src="script.js"></script>
+      <br>
+      <div class="page-wrapper">
+
+        <section class="why-velvorax scroll-reveal">
+          <h2 class="main-title">Why Velvorax?<span class="title-glow-line"></span></h2>
+
+          <div class="grid-5-columns">
+            <div class="v-card neon-red">
+              <div class="v-icon-wrap"><i class="fa-solid fa-building"></i></div>
+              <h3>One Account Multiple Companies</h3>
+              <p>Manage unlimited companies from a single secure account seamlessly.</p>
+              <div class="glow-layer"></div>
+            </div>
+            <div class="v-card neon-blue">
+              <div class="v-icon-wrap"><i class="fa-solid fa-layer-group"></i></div>
+              <h3>All-In-One Platform</h3>
+              <p>CRM, Marketing, Sales, and Automation working natively in one spot.</p>
+              <div class="glow-layer"></div>
+            </div>
+            <div class="v-card neon-purple">
+              <div class="v-icon-wrap"><i class="fa-solid fa-robot"></i></div>
+              <h3>Automation Driven Growth</h3>
+              <p>Save time, minimize mistakes, and scale your operations entirely on autopilot.</p>
+              <div class="glow-layer"></div>
+            </div>
+            <div class="v-card neon-teal">
+              <div class="v-icon-wrap"><i class="fa-solid fa-chart-line"></i></div>
+              <h3>Scalable Solutions</h3>
+              <p>Perfect structural engine built for agile startups up to enterprise firms.</p>
+              <div class="glow-layer"></div>
+            </div>
+            <div class="v-card neon-amber">
+              <div class="v-icon-wrap"><i class="fa-solid fa-headset"></i></div>
+              <h3>Dedicated Support</h3>
+              <p>Our dedicated engineering squads back you up around the clock.</p>
+              <div class="glow-layer"></div>
+            </div>
+          </div>
+        </section>
+
+
+        <div class="bottom-row-container">
+
+          <section class="our-approach scroll-reveal">
+            <h2 class="sub-title">Our Approach</h2>
+
+            <div class="timeline-container">
+              <div class="timeline-progress-line">
+                <div class="line-fill"></div>
+              </div>
+
+              <div class="timeline-node">
+                <div class="node-circle circle-blue">
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                  <span class="node-num">1</span>
+                </div>
+                <h3>Understand</h3>
+                <p>Mapping your target demographics, KPIs, and technology blocks.</p>
+              </div>
+
+              <div class="timeline-node">
+                <div class="node-circle circle-purple">
+                  <i class="fa-solid fa-puzzle-piece"></i>
+                  <span class="node-num">2</span>
+                </div>
+                <h3>Build</h3>
+                <p>Developing architecture structured exactly to your scale requests.</p>
+              </div>
+
+              <div class="timeline-node">
+                <div class="node-circle circle-pink">
+                  <i class="fa-solid fa-gear"></i>
+                  <span class="node-num">3</span>
+                </div>
+                <h3>Automate</h3>
+                <p>Injecting operational recipes that wipe out manual entry lines.</p>
+              </div>
+
+              <div class="timeline-node">
+                <div class="node-circle circle-orange">
+                  <i class="fa-solid fa-users"></i>
+                  <span class="node-num">4</span>
+                </div>
+                <h3>Convert</h3>
+                <p>Turning standard funnels into consistent high-yielding transactions.</p>
+              </div>
+
+              <div class="timeline-node">
+                <div class="node-circle circle-teal">
+                  <i class="fa-solid fa-arrow-up-right-dots"></i>
+                  <span class="node-num">5</span>
+                </div>
+                <h3>Scale</h3>
+                <p>Continuous cloud optimization for compounding long-term growth.</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="our-impact scroll-reveal">
+            <div class="luxury-impact-box">
+              <h2 class="impact-title-header">Our Impact So Far</h2>
+
+              <div class="premium-stats-grid">
+                <div class="premium-tile">
+                  <div class="tile-icon"><i class="fa-solid fa-face-smile"></i></div>
+                  <div>
+                    <h4 class="count-number" data-target="500">0</h4>
+                    <p>Happy Clients</p>
+                  </div>
+                </div>
+                <div class="premium-tile">
+                  <div class="tile-icon"><i class="fa-solid fa-briefcase"></i></div>
+                  <div>
+                    <h4 class="count-number" data-target="1200">0</h4>
+                    <p>Projects Delivered</p>
+                  </div>
+                </div>
+                <div class="premium-tile">
+                  <div class="tile-icon"><i class="fa-solid fa-earth-americas"></i></div>
+                  <div>
+                    <h4 class="count-number" data-target="20">0</h4>
+                    <p>Countries Served</p>
+                  </div>
+                </div>
+                <div class="premium-tile">
+                  <div class="tile-icon"><i class="fa-solid fa-headset"></i></div>
+                  <div>
+                    <h4 class="static-number">24/7</h4>
+                    <p>Support Available</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </div> </div> <script src="script.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+      <!-- CEO Title -->
+
+    </div>
+  </div>
+</main>
+
+<script>feather.replace();</script>
+
+<!-- COMPACT MODERN FOOTER -->
+
+
+<!-- Enterprise Multi-Column Footer -->
+<footer class="mt-auto py-16 border-t border-white/5 bg-[#030308] relative overflow-hidden z-10">
+  <div class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-yellow-500/5 rounded-full blur-[120px] -z-10"></div>
+
+  <div class="max-w-7xl mx-auto px-8 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-12 mb-16">
+    <!-- Brand Column -->
+    <div class="lg:col-span-1">
+      <div class="flex items-center mb-6">
+        <img src="assets/logo.jpg" class="w-10 h-10 rounded-full border border-yellow-500/20 mr-3">
+        <div>
+          <h2 class="text-white font-black text-xl tracking-tight uppercase leading-none">Velvorax</h2>
+          <p class="text-[8px] text-yellow-500 font-bold tracking-[0.2em] uppercase mt-1">Software Solution</p>
+        </div>
+      </div>
+      <p class="text-[11px] text-gray-500 leading-relaxed mb-8 max-w-xs">
+        Intelligent automation for the modern enterprise. We empower businesses to generate customers using websites, apps, and autonomous CRM systems.
+      </p>
+      <div class="flex space-x-4 text-gray-600">
+        <a href="https://www.linkedin.com/company/velvoro-software-solutions/" target="_blank" class="hover:text-yellow-400 transition-colors"><i data-feather="linkedin" class="w-4 h-4"></i></a>
+        <a href="https://x.com/VelvoroO" target="_blank" class="hover:text-yellow-400 transition-colors">
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.248 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.045 4.126H5.078z"/></svg>
+        </a>
+        <a href="https://www.instagram.com/velvoro_software?igsh=MWRyczU3Z2ZicWVtbA==" target="_blank" class="hover:text-yellow-400 transition-colors"><i data-feather="instagram" class="w-4 h-4"></i></a>
+        <a href="https://www.facebook.com/share/1NqjdZAKo2/" target="_blank" class="hover:text-yellow-400 transition-colors"><i data-feather="facebook" class="w-4 h-4"></i></a>
+        <a href="https://youtube.com/@velvorosoftwaresolution?si=7fMvTlRsIZ9UK9C0" target="_blank" class="hover:text-yellow-400 transition-colors"><i data-feather="youtube" class="w-4 h-4"></i></a>
+      </div>
+    </div>
+
+    <!-- Product Column -->
+    <div>
+      <h3 class="text-white font-black text-[10px] uppercase tracking-[0.2em] mb-6">Product</h3>
+      <ul class="space-y-4 text-[11px] text-gray-500 font-bold uppercase tracking-widest">
+        <li><a href="features.html" class="hover:text-yellow-500 transition-colors">Features</a></li>
+        <li><a href="pricing.html" class="hover:text-yellow-500 transition-colors">Pricing</a></li>
+        <li><a href="partner.html" class="hover:text-yellow-500 transition-colors">Partners</a></li>
+        <li><a href="#" class="hover:text-yellow-500 transition-colors text-gray-700">Blog</a></li>
+      </ul>
+    </div>
+
+    <!-- Solutions Column -->
+    <div>
+      <h3 class="text-white font-black text-[10px] uppercase tracking-[0.2em] mb-6">Solutions</h3>
+      <ul class="space-y-4 text-[11px] text-gray-500 font-bold uppercase tracking-widest">
+        <li><a href="services.html" class="hover:text-yellow-500 transition-colors">AI Automation</a></li>
+        <li><a href="services.html" class="hover:text-yellow-500 transition-colors">Web Development</a></li>
+        <li><a href="services.html" class="hover:text-yellow-500 transition-colors">CRM Systems</a></li>
+      </ul>
+    </div>
+
+    <!-- Contact Column -->
+    <div class="lg:col-span-1">
+      <h3 class="text-white font-black text-[10px] uppercase tracking-[0.2em] mb-6">Contact</h3>
+      <ul class="space-y-4 text-[11px]">
+        <li>
+          <a href="mailto:raraju@velvorax.tech" class="flex items-center text-gray-500 hover:text-white transition-colors group">
+            <i data-feather="mail" class="w-4 h-4 mr-3 text-yellow-500 group-hover:scale-110 transition-transform shrink-0"></i>
+            <span class="font-bold tracking-widest truncate">raraju@velvorax.tech</span>
+          </a>
+        </li>
+        <li>
+          <a href="tel:+919985201116" class="flex items-center text-gray-500 hover:text-white transition-colors group">
+            <i data-feather="phone" class="w-4 h-4 mr-3 text-yellow-500 group-hover:scale-110 transition-transform shrink-0"></i>
+            <span class="font-bold tracking-widest">+91 9985201116</span>
+          </a>
+        </li>
+        <li>
+          <a href="https://www.google.com/maps/search/?api=1&query=Flat+303,+Sri+Mani+Sai+Arcade,+X+Road,+Miyapur,+Hyderabad,+Telangana+500049" target="_blank" class="flex items-start text-gray-500 hover:text-white transition-colors group">
+            <i data-feather="map-pin" class="w-4 h-4 mr-3 mt-1 text-yellow-500 group-hover:scale-110 transition-transform shrink-0"></i>
+            <span class="font-bold tracking-widest leading-relaxed">
+                  Flat 303, Sri Mani Sai Arcade, 'X' Road<br>
+                  Miyapur, Hyderabad, Telangana - 500049
+                </span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Company Column -->
+    <div>
+      <h3 class="text-white font-black text-[10px] uppercase tracking-[0.2em] mb-6">Company</h3>
+      <ul class="space-y-4 text-[11px] text-gray-500 font-bold uppercase tracking-widest">
+        <li><a href="about.html" class="hover:text-yellow-500 transition-colors">About Us</a></li>
+        <li><a href="privacy.html" class="hover:text-yellow-500 transition-colors">Privacy Policy</a></li>
+        <li><a href="terms.html" class="hover:text-yellow-500 transition-colors">Terms of Service</a></li>
+        <li><a href="#" class="hover:text-yellow-500 transition-colors text-gray-700">Careers</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Bottom Bar -->
+  <div class="max-w-7xl mx-auto px-8 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+    <p class="text-[9px] text-gray-700 font-black uppercase tracking-[0.3em]">
+      &copy; 2026 VELVORAX SOFTWARE SOLUTIONS. ALL RIGHTS RESERVED.
+    </p>
+    <div class="flex items-center space-x-8 text-[9px] text-gray-700 font-black uppercase tracking-[0.3em]">
+      <span class="hover:text-white transition-colors cursor-default">SECURE</span>
+      <span class="hover:text-white transition-colors cursor-default">ENCRYPTED</span>
+      <span class="text-green-500 flex items-center">
+            <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-2 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.8)]"></span>
+            SYSTEMS OPERATIONAL
+          </span>
+    </div>
+  </div>
+</footer>
+<script>if(window.feather) feather.replace();</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // 1. Feather Icons Initialization
+    if(window.feather) feather.replace();
+
+    // 2. CONSISTENT INTERSECTION OBSERVER (Fade-in & Reveal)
+    const observerOptions = {
+        root: null,
+        threshold: 0.1,
+        rootMargin: "0px"
+    };
+
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible', 'active');
+
+                // Specific Logic for Timeline/Impact
+                if (entry.target.classList.contains('our-approach')) {
+                    const fill = entry.target.querySelector('.line-fill');
+                    if (fill) fill.style.width = '100%';
+                }
+                if (entry.target.classList.contains('our-impact')) {
+                    triggerCounters();
+                }
+                revealObserver.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.fade-in, .scroll-reveal').forEach(el => revealObserver.observe(el));
+
+    // 3. METRIC TICK UP COUNTER
+    function triggerCounters() {
+        const counters = document.querySelectorAll('.count-number');
+        counters.forEach(counter => {
+            const target = +counter.getAttribute('data-target');
+            const duration = 2500;
+            const startTime = performance.now();
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const ease = 1 - Math.pow(1 - progress, 4); // Quart easing
+                counter.innerText = Math.floor(ease * target);
+                if (progress < 1) requestAnimationFrame(update);
+                else counter.innerText = target;
+            }
+            requestAnimationFrame(update);
+        });
+    }
+
+    // 4. ADVANCED 3D TILT & PARALLAX EFFECT
+    const interactiveElements = document.querySelectorAll('.card, .v-card, .glass-panel');
+
+    interactiveElements.forEach(el => {
+        el.addEventListener('mousemove', (e) => {
+            const rect = el.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            // Intensify tilt based on size
+            const intensity = el.classList.contains('glass-panel') ? 10 : 25;
+            const rotateX = ((y - centerY) / centerY) * -intensity;
+            const rotateY = ((x - centerX) / centerX) * intensity;
+
+            el.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
+
+            // Dynamic Glow Follow
+            const glow = el.querySelector('.card-glow, .glow-layer');
+            if (glow) {
+                const px = (x / rect.width) * 100;
+                const py = (y / rect.height) * 100;
+                glow.style.background = `radial-gradient(circle at ${px}% ${py}%, rgba(255, 255, 255, 0.3) 0%, transparent 80%)`;
+                glow.style.opacity = '1';
+            }
+        });
+
+        el.addEventListener('mouseleave', () => {
+            el.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+            const glow = el.querySelector('.card-glow, .glow-layer');
+            if (glow) glow.style.opacity = '0';
+        });
+    });
+
+    // 5. PARALLAX STARS (3D Scrolling)
+    window.addEventListener('scroll', () => {
+        const scrolled = window.pageYOffset;
+        const stars1 = document.getElementById('stars');
+        const stars2 = document.getElementById('stars2');
+        const stars3 = document.getElementById('stars3');
+
+        if(stars1) stars1.style.transform = `translateY(${scrolled * 0.1}px)`;
+        if(stars2) stars2.style.transform = `translateY(${scrolled * 0.2}px)`;
+        if(stars3) stars3.style.transform = `translateY(${scrolled * 0.3}px)`;
+    });
+});
+</script>
+</body>
+</html>

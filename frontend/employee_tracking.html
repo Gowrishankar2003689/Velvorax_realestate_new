@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employee Tracking - Velvorax</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://unpkg.com/feather-icons"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    if (!VelvoraxAuth.isAuthenticated()) window.location.href = 'login.html';
+  </script>
+  <script src="js/api-config.js"></script>
+</head>
+<body class="antialiased bg-[#0a0a0f] h-screen overflow-hidden flex text-gray-300">
+
+        <!-- Sidebar -->
+  <aside class="sidebar w-64 border-r border-white/5 bg-[#030308] flex flex-col shrink-0">
+    <div class="p-8 border-b border-white/5">
+      <a href="dashboard-super.html" class="flex items-center group">
+        <div class="brand-logo-box group-hover:scale-105 transition-transform">
+          <img src="assets/logo.jpg" class="w-8 h-8 rounded-full">
+        </div>
+        <div class="ml-3">
+          <h2 class="brand-text uppercase font-bold text-yellow-400">Velvorax</h2>
+          <p class="text-[0.5rem] text-gray-500 tracking-[0.2em] uppercase mt-1">Enterprise OS</p>
+        </div>
+      </a>
+    </div>
+    <nav class="flex-1 overflow-y-auto py-6 sidebar-nav scrollbar-hide px-3 space-y-1">
+      <div class="sidebar-section-title px-4 mt-6 mb-2 text-[10px] uppercase text-gray-600 font-bold tracking-[0.2em] first:mt-0">CRM</div>
+      <a href="dashboard-super.html" class="sidebar-link" id="nav-dashboard"><i data-feather="grid" class="w-4 h-4 mr-3"></i> Dashboard</a>
+      <a href="leads.html" class="sidebar-link"><i data-feather="users" class="w-4 h-4 mr-3"></i> Leads</a>
+      <a href="contacts.html" class="sidebar-link"><i data-feather="phone" class="w-4 h-4 mr-3"></i> Contacts</a>
+
+      <!-- Super Admin Only Tabs -->
+      <div id="superAdminTabs" class="hidden contents">
+        <a href="user-approvals.html" class="sidebar-link">
+            <i data-feather="user-check" class="w-4 h-4 mr-3"></i>
+            User Approvals
+        </a>
+        <a href="client-accounts.html" class="sidebar-link">
+            <i data-feather="briefcase" class="w-4 h-4 mr-3"></i>
+            Client Accounts
+        </a>
+        <a href="admin_pricing.html" class="sidebar-link">
+            <i data-feather="dollar-sign" class="w-4 h-4 mr-3"></i>
+            Pricing Plans
+        </a>
+      </div>
+
+      <a href="accounts.html" class="sidebar-link"><i data-feather="briefcase" class="w-4 h-4 mr-3"></i> Accounts</a>
+      <a href="opportunities.html" class="sidebar-link"><i data-feather="target" class="w-4 h-4 mr-3"></i> Deals</a>
+      <a href="#" onclick="alert('Goals Module Coming Soon')" class="sidebar-link"><i data-feather="award" class="w-4 h-4 mr-3"></i> Goals</a>
+      <div class="sidebar-section-title px-4 mt-6 mb-2 text-[10px] uppercase text-gray-600 font-bold tracking-[0.2em] first:mt-0">PERFORMANCE</div>
+      <a href="cases.html" class="sidebar-link"><i data-feather="life-buoy" class="w-4 h-4 mr-3"></i> Tickets</a>
+      <a href="tasks.html" class="sidebar-link"><i data-feather="check-square" class="w-4 h-4 mr-3"></i> Tasks</a>
+      <a href="employee_tracking.html" class="sidebar-link active"><i data-feather="activity" class="w-4 h-4 mr-3"></i> Employee Tracking</a>
+      <a href="social.html" class="sidebar-link"><i data-feather="share-2" class="w-4 h-4 mr-3"></i> Social Media</a>
+      <div class="sidebar-section-title px-4 mt-6 mb-2 text-[10px] uppercase text-gray-600 font-bold tracking-[0.2em] first:mt-0">FINANCE</div>
+      <a href="invoices.html" class="sidebar-link"><i data-feather="file-text" class="w-4 h-4 mr-3"></i> Invoices</a>
+      <a href="reports.html" class="sidebar-link"><i data-feather="bar-chart-2" class="w-4 h-4 mr-3"></i> Reports</a>
+      <div class="sidebar-section-title px-4 mt-6 mb-2 text-[10px] uppercase text-gray-600 font-bold tracking-[0.2em] first:mt-0">ADMIN</div>
+      <a href="settings.html" class="sidebar-link"><i data-feather="settings" class="w-4 h-4 mr-3"></i> Settings</a>
+    </nav>
+    <div class="p-4 border-t border-white/5">
+      <button onclick="VelvoraxAuth.logout()" class="sidebar-link text-red-500 hover:bg-red-500/10 w-full text-left flex items-center">
+        <i data-feather="log-out" class="w-4 h-4 mr-3"></i> Sign Out
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 overflow-y-auto p-8 relative">
+    <header class="flex justify-between items-center mb-10">
+      <div>
+        <h1 class="text-3xl font-bold text-white">Workforce Analytics</h1>
+        <p class="text-gray-500 text-sm mt-1">Monitor staff productivity and track real-time activity timelines.</p>
+      </div>
+      <div>
+        <a href="assets/Velvorax_app.apk" download class="flex items-center px-6 py-3 bg-yellow-400 text-black rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-yellow-400/20">
+          <i data-feather="smartphone" class="w-4 h-4 mr-2"></i> Download Tracking APK
+        </a>
+      </div>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <!-- Stats Overview -->
+      <div class="lg:col-span-4 grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="glass-card p-6 border-white/5 bg-white/[0.02]">
+          <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Total Employees</p>
+          <h2 id="totalEmployees" class="text-3xl font-bold text-white">0</h2>
+        </div>
+        <div class="glass-card p-6 border-white/5 bg-white/[0.02]">
+          <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Avg Productivity</p>
+          <h2 id="avgProductivity" class="text-3xl font-bold text-green-400">0%</h2>
+        </div>
+        <div class="glass-card p-6 border-white/5 bg-white/[0.02]">
+          <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Active Now</p>
+          <h2 id="activeNow" class="text-3xl font-bold text-yellow-400">0</h2>
+        </div>
+        <div class="glass-card p-6 border-white/5 bg-white/[0.02]">
+          <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Tasks Completed</p>
+          <h2 id="tasksCompleted" class="text-3xl font-bold text-blue-400">0</h2>
+        </div>
+      </div>
+
+      <!-- Employee List & Charts -->
+      <div class="lg:col-span-3 space-y-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+           <!-- Work Distribution Card -->
+           <div class="glass-card p-6 border-white/5 bg-white/[0.02] flex flex-col">
+             <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest">Work Distribution</h3>
+                <i data-feather="pie-chart" class="w-3.5 h-3.5 text-yellow-500"></i>
+             </div>
+
+             <div class="h-[200px] relative mb-6">
+                <canvas id="workPieChart"></canvas>
+             </div>
+
+             <div class="mt-auto border-t border-white/5 pt-4">
+                <table class="w-full text-left text-[10px]">
+                  <thead>
+                    <tr class="text-gray-600 border-b border-white/5 uppercase font-bold">
+                      <th class="pb-2">Staff Member</th>
+                      <th class="pb-2 text-center">Done</th>
+                      <th class="pb-2 text-right">Efficiency</th>
+                    </tr>
+                  </thead>
+                  <tbody id="workDistributionTableBody" class="text-gray-400">
+                    <!-- Dynamic Rows -->
+                  </tbody>
+                </table>
+             </div>
+           </div>
+
+           <!-- Weekly Progress Card -->
+           <div class="glass-card p-6 border-white/5 bg-white/[0.02] flex flex-col">
+             <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest">Weekly Performance</h3>
+                <i data-feather="trending-up" class="w-3.5 h-3.5 text-green-500"></i>
+             </div>
+             <div class="h-[300px] relative">
+                <canvas id="progressLineChart"></canvas>
+             </div>
+           </div>
+        </div>
+
+        <div>
+          <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-6">Real-time Performance</h3>
+          <div id="employeeGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Dynamic Employee Cards -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Detail Timeline Section -->
+      <div class="lg:col-span-1 space-y-8">
+        <div class="glass-card p-8 border-white/5 bg-white/[0.02]">
+          <h3 class="text-xs font-bold text-gray-400 uppercase tracking-[0.2em] mb-8 flex items-center">
+            <i data-feather="map-pin" class="w-4 h-4 mr-3 text-red-500"></i> Live Location
+          </h3>
+          <div id="map" class="w-full h-48 rounded-xl bg-white/5 mb-4 overflow-hidden border border-white/10">
+            <div class="w-full h-full flex items-center justify-center text-gray-600 text-[10px] uppercase tracking-widest">
+                Map View Initializing...
+            </div>
+          </div>
+          <p id="locationText" class="text-[10px] text-gray-500 italic">Select an employee to track.</p>
+        </div>
+
+        <div class="glass-card p-8 border-white/5 bg-white/[0.02]">
+          <h3 class="text-xs font-bold text-gray-400 uppercase tracking-[0.2em] mb-8 flex items-center">
+            <i data-feather="check-square" class="w-4 h-4 mr-3 text-blue-500"></i> Recent Tasks
+          </h3>
+          <div id="taskTimeline" class="space-y-4">
+            <p class="text-gray-600 text-xs text-center py-10 italic">Select an employee to view tasks.</p>
+          </div>
+        </div>
+
+        <div class="glass-card p-8 border-white/5 bg-white/[0.02]">
+          <h3 class="text-xs font-bold text-gray-400 uppercase tracking-[0.2em] mb-8 flex items-center">
+            <i data-feather="clock" class="w-4 h-4 mr-3 text-yellow-500"></i> Daily Activity
+          </h3>
+          <div id="activityTimeline" class="space-y-4">
+            <p class="text-gray-600 text-xs text-center py-10 italic">Select an employee to view activity.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Footer -->
+    
+  
+  
+
+
+  
+
+
+  
+
+
+  <footer class="mt-auto py-8 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4 opacity-50 hover:opacity-100 transition-opacity">
+    <p class="text-[9px] text-gray-500 uppercase tracking-widest">
+      &copy; 2026 Velvorax Enterprise OS. All rights reserved.
+    </p>
+    <div class="flex space-x-6 text-[9px] text-gray-600 uppercase tracking-widest">
+      <a href="privacy.html" class="hover:text-white transition">Privacy</a>
+      <a href="terms.html" class="hover:text-white transition">Terms</a>
+      <span class="text-green-500 flex items-center">
+        <span class="w-1 h-1 bg-green-500 rounded-full mr-1.5 animate-pulse"></span> SECURE SESSION
+      </span>
+    </div>
+  </footer>
+
+</main>
+
+  <script>
+    feather.replace();
+    let workChart, progressChart;
+
+    function checkSuperAdmin() {
+      // Role-based UI visibility
+      const user = VelvoraxAuth.getUser();
+      const superAdminContainer = document.getElementById('superAdminTabs');
+      if (user && user.role === 'super_admin') {
+        if (superAdminContainer) superAdminContainer.classList.remove('hidden');
+      } else {
+        if (superAdminContainer) superAdminContainer.classList.add('hidden');
+        const dashLink = document.getElementById('nav-dashboard');
+        if (dashLink) {
+          dashLink.href = user && user.role === 'staff' ? 'dashboard-user.html' : 'dashboard-client.html';
+        }
+      }
+    }
+
+    async function fetchEmployees() {
+      checkSuperAdmin();
+      console.log("Fetching employee stats...");
+      try {
+        if (typeof CONFIG === 'undefined') {
+            console.error("CONFIG is not defined! Check api-config.js load.");
+            return;
+        }
+
+        const res = await fetch(CONFIG.API_BASE_URL + '/api/employee/stats', {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        });
+
+        if (!res.ok) {
+            const errData = await res.json();
+            console.error("API Error:", errData);
+            return;
+        }
+
+        const employees = await res.json();
+        console.log("Employees loaded:", employees);
+
+        updateStats(employees);
+        renderEmployees(employees);
+        initCharts(employees);
+
+        // Update Map Markers if any employee has location
+        updateMap(employees);
+
+        // If only one employee (Standard User), auto-select them
+        if (employees.length === 1) {
+            selectEmployee(employees[0]._id);
+        }
+      } catch (err) {
+        console.error("Fetch failed:", err);
+      }
+    }
+
+    // Auto-refresh every 30 seconds for live tracking
+    setInterval(fetchEmployees, 30000);
+
+    function updateMap(employees) {
+        const activeTracking = employees.filter(e => e.location && e.location.lat);
+        if (activeTracking.length > 0) {
+            // In a real Google Maps implementation, you would update markers here
+            // For now, we update the status text of the currently selected user if they have a real location
+        }
+    }
+
+    function updateStats(employees) {
+      document.getElementById('totalEmployees').textContent = employees.length;
+
+      let totalProgress = 0;
+      let totalCompleted = 0;
+
+      employees.forEach(emp => {
+          totalProgress += (emp.taskProgress || 0);
+          totalCompleted += (emp.completedTasks || 0);
+      });
+
+      const avgProd = employees.length > 0 ? Math.round(totalProgress / employees.length) : 0;
+
+      document.getElementById('avgProductivity').textContent = avgProd + '%';
+      document.getElementById('activeNow').textContent = employees.filter(e => e.isLoggedIn).length;
+      document.getElementById('tasksCompleted').textContent = totalCompleted;
+    }
+
+    function renderEmployees(employees) {
+      const grid = document.getElementById('employeeGrid');
+      grid.innerHTML = '';
+
+      if (employees.length === 0) {
+        grid.innerHTML = `
+            <div class="col-span-2 p-10 bg-white/5 border border-dashed border-white/10 rounded-2xl text-center">
+                <i data-feather="users" class="w-10 h-10 text-gray-700 mx-auto mb-4"></i>
+                <p class="text-gray-500 font-bold uppercase tracking-widest text-xs">No employees found in your company</p>
+                <p class="text-gray-600 text-[10px] mt-2">Go to User Approvals or Settings to manage staff.</p>
+            </div>
+        `;
+        feather.replace();
+        return;
+      }
+
+      employees.forEach(emp => {
+        const progress = emp.taskProgress || 0;
+        const lastSession = (emp.workSessions && emp.workSessions.length) ? emp.workSessions[emp.workSessions.length - 1] : null;
+        const lastPunchIn = lastSession && lastSession.punchIn ? formatDateTime(lastSession.punchIn) : '—';
+        const lastPunchOut = lastSession && lastSession.punchOut ? formatDateTime(lastSession.punchOut) : '—';
+        const lastDuration = lastSession ? (lastSession.durationMinutes || 0) : 0;
+        grid.innerHTML += `
+          <div onclick="selectEmployee('${emp._id}')" class="glass-card p-6 border-white/5 bg-white/[0.02] hover:bg-white/[0.05] transition-all cursor-pointer group">
+            <div class="flex items-center gap-4 mb-6">
+              <div class="relative">
+                <div class="w-12 h-12 bg-yellow-400 rounded-xl flex items-center justify-center text-black font-bold text-lg">
+                  ${emp.name ? emp.name.charAt(0) : '?'}
+                </div>
+                <span class="absolute -bottom-1 -right-1 w-3 h-3 border-2 border-[#0a0a0f] rounded-full ${emp.isLoggedIn ? 'bg-green-500' : 'bg-gray-500'}"></span>
+              </div>
+              <div>
+                <h4 class="font-bold text-white group-hover:text-yellow-400 transition-colors">${emp.name || 'Unknown'}</h4>
+                <p class="text-[10px] text-gray-500 uppercase tracking-widest">${emp.role || emp.type || 'Staff'}</p>
+              </div>
+              <div class="ml-auto text-right">
+                <p class="text-[10px] text-gray-500 uppercase">Work Progress</p>
+                <p class="text-lg font-bold text-yellow-400">${progress}%</p>
+              </div>
+            </div>
+
+            <div class="space-y-3">
+               <div class="w-full bg-white/5 rounded-full h-1.5">
+                  <div class="bg-yellow-400 h-1.5 rounded-full transition-all duration-500" style="width: ${progress}%"></div>
+               </div>
+               <div class="flex justify-between text-[10px] text-gray-600 uppercase font-bold">
+                  <span>${emp.completedTasks || 0} Tasks Done</span>
+                  <span>${emp.totalTasks || 0} Total</span>
+               </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 pt-4 mt-4 border-t border-white/5">
+              <div>
+                <p class="text-[10px] text-gray-600 uppercase mb-1">Quality</p>
+                <p class="text-sm font-bold text-white">${emp.qualityScore || 0}%</p>
+              </div>
+              <div>
+                <p class="text-[10px] text-gray-600 uppercase mb-1">Work Hours</p>
+                <p class="text-sm font-bold text-white">${formatMinutes(emp.workMinutes || 0)}</p>
+                <p class="text-[9px] text-gray-400 mt-1">Last: ${lastPunchIn} — ${lastPunchOut}</p>
+                <p class="text-[9px] text-gray-400">Session: ${lastDuration} min</p>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      feather.replace();
+    }
+
+    function formatMinutes(minutes) {
+        const h = Math.floor(minutes / 60);
+        const m = minutes % 60;
+        return `${h}h ${m}m`;
+    }
+
+    function formatDateTime(dateStr) {
+      if (!dateStr) return '—';
+      const d = new Date(dateStr);
+      try {
+        return d.toLocaleString([], { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+      } catch (e) {
+        return d.toString();
+      }
+    }
+
+    function initCharts(employees) {
+      // 1. Work Distribution (Pie Chart & Table)
+      const pieCtx = document.getElementById('workPieChart');
+      if (pieCtx) {
+          const labels = employees.length > 0 ? employees.map(e => e.name) : ['No Data'];
+          const data = employees.length > 0 ? employees.map(e => e.completedTasks || 0) : [1];
+          const colors = ['#facc15', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4'];
+
+          if (workChart) workChart.destroy();
+          workChart = new Chart(pieCtx.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+              labels: labels,
+              datasets: [{
+                data: data,
+                backgroundColor: colors,
+                borderWidth: 0,
+                hoverOffset: 10
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false } // Hide legend to save space for table
+              },
+              cutout: '75%'
+            }
+          });
+
+          // Populate the summary table
+          const tableBody = document.getElementById('workDistributionTableBody');
+          tableBody.innerHTML = '';
+          employees.forEach((emp, index) => {
+              const color = colors[index % colors.length];
+              tableBody.innerHTML += `
+                <tr class="border-b border-white/5 hover:bg-white/[0.02]">
+                  <td class="py-2 flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full" style="background: ${color}"></span>
+                    <span class="truncate max-w-[100px]">${emp.name}</span>
+                  </td>
+                  <td class="py-2 text-center text-white font-bold">${emp.completedTasks || 0}</td>
+                  <td class="py-2 text-right">
+                    <span class="text-green-500 font-bold">${emp.taskProgress || 0}%</span>
+                  </td>
+                </tr>
+              `;
+          });
+      }
+
+      // 2. Weekly Performance (Line Chart)
+      const lineCtx = document.getElementById('progressLineChart');
+      if (lineCtx) {
+          if (progressChart) progressChart.destroy();
+          progressChart = new Chart(lineCtx.getContext('2d'), {
+            type: 'line',
+            data: {
+              labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+              datasets: [{
+                label: 'Team Output',
+                data: [12, 19, 15, 25, 22, 30, 45],
+                borderColor: '#facc15',
+                borderWidth: 2,
+                pointBackgroundColor: '#facc15',
+                pointRadius: 4,
+                tension: 0.4,
+                fill: true,
+                backgroundColor: 'rgba(250, 204, 21, 0.05)'
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#0a0a0f',
+                    titleColor: '#9ca3af',
+                    bodyColor: '#fff',
+                    borderColor: 'rgba(255,255,255,0.1)',
+                    borderWidth: 1,
+                    padding: 10,
+                    displayColors: false
+                }
+              },
+              scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(255,255,255,0.03)', drawBorder: false },
+                    ticks: { color: '#4b5563', font: { size: 9 } }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#4b5563', font: { size: 9 } }
+                }
+              }
+            }
+          });
+      }
+    }
+
+    async function selectEmployee(userId) {
+       console.log("Selecting employee:", userId);
+       viewTimeline(userId);
+       viewTasks(userId);
+       document.getElementById('locationText').innerHTML = `<i data-feather="loader" class="w-3 h-3 animate-spin inline mr-1"></i> Fetching live coordinates...`;
+       feather.replace();
+
+       try {
+           const res = await fetch(CONFIG.API_BASE_URL + '/api/employee/stats', {
+               headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+           });
+           const employees = await res.json();
+           const emp = employees.find(e => e._id === userId);
+
+           if (emp && emp.location && emp.location.lat) {
+               const lastSeen = new Date(emp.location.lastUpdated).toLocaleTimeString();
+               document.getElementById('locationText').innerHTML = `
+                <span class="text-green-500 font-bold">${emp.location.lat.toFixed(4)}° N, ${emp.location.lng.toFixed(4)}° E</span>
+                <br><span class="text-[8px] text-gray-600 uppercase">Last seen: ${lastSeen}</span>
+               `;
+           } else {
+               // Fallback mock if no real data from app yet
+               setTimeout(() => {
+                  document.getElementById('locationText').innerHTML = `<span class="text-yellow-500 italic">No live data from app yet.</span><br><span class="text-[8px]">Showing last known: Hyderabad, TS</span>`;
+               }, 1000);
+           }
+       } catch (e) { console.error(e); }
+    }
+
+    async function viewTasks(userId) {
+      const timeline = document.getElementById('taskTimeline');
+      timeline.innerHTML = '<p class="text-center text-gray-600 py-10">Loading tasks...</p>';
+
+      try {
+        const res = await fetch(CONFIG.API_BASE_URL + '/api/employee/stats', {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        });
+        const employees = await res.json();
+        const emp = employees.find(e => e._id === userId);
+
+        timeline.innerHTML = '';
+        if (!emp || !emp.recentTasks || emp.recentTasks.length === 0) {
+          timeline.innerHTML = '<p class="text-center text-gray-600 py-10 italic">No tasks assigned.</p>';
+          return;
+        }
+
+        emp.recentTasks.forEach(task => {
+          const statusColor = task.status === 'Completed' ? 'text-green-400' : 'text-yellow-400';
+          timeline.innerHTML += `
+            <div class="p-3 rounded-lg bg-white/5 border border-white/5">
+              <div class="flex justify-between items-start mb-2">
+                <p class="text-xs font-bold text-white">${task.title}</p>
+                <span class="text-[9px] px-1.5 py-0.5 rounded bg-white/10 ${statusColor}">${task.status}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <div class="flex-1 bg-white/5 h-1 rounded-full overflow-hidden">
+                  <div class="bg-blue-500 h-full" style="width: ${task.percentage}%"></div>
+                </div>
+                <span class="text-[9px] text-gray-500">${task.percentage}%</span>
+              </div>
+            </div>
+          `;
+        });
+      } catch (err) { console.error(err); }
+    }
+
+    async function viewTimeline(userId) {
+      const timeline = document.getElementById('activityTimeline');
+      timeline.innerHTML = '<p class="text-center text-gray-600 py-10">Loading...</p>';
+
+      try {
+        const res = await fetch(CONFIG.API_BASE_URL + '/api/employee/stats', {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        });
+        const employees = await res.json();
+        const emp = employees.find(e => e._id === userId);
+
+        timeline.innerHTML = '';
+        // Show recent work sessions first (punch in/out and duration)
+        if (emp && emp.workSessions && emp.workSessions.length > 0) {
+          const sessions = [...emp.workSessions].reverse();
+          sessions.forEach(s => {
+            const pin = s.punchIn ? formatDateTime(s.punchIn) : '—';
+            const pout = s.punchOut ? formatDateTime(s.punchOut) : '—';
+            const dur = s.durationMinutes || 0;
+            timeline.innerHTML += `
+              <div class="relative pl-6 pb-4 border-l border-white/10">
+                <div class="absolute -left-[5px] top-1 w-2.5 h-2.5 bg-yellow-400 rounded-full"></div>
+                <div class="flex justify-between items-start">
+                  <div>
+                    <p class="text-xs font-bold text-white">Session</p>
+                    <p class="text-[9px] text-gray-500 uppercase tracking-widest mt-0.5">${pin} — ${pout}</p>
+                  </div>
+                  <span class="text-[10px] text-gray-600 font-bold">${dur}m</span>
+                </div>
+              </div>
+            `;
+          });
+        }
+
+        if (!emp || !emp.dailyActivityLog || emp.dailyActivityLog.length === 0) {
+          if (!emp || !emp.workSessions || emp.workSessions.length === 0) {
+            timeline.innerHTML = '<p class="text-center text-gray-600 py-10 italic">No activity today.</p>';
+            return;
+          }
+        }
+
+        [...emp.dailyActivityLog].reverse().forEach(log => {
+          const time = new Date(log.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          timeline.innerHTML += `
+            <div class="relative pl-6 pb-6 border-l border-white/10 last:pb-0">
+              <div class="absolute -left-[5px] top-1 w-2.5 h-2.5 bg-yellow-400 rounded-full shadow-[0_0_10px_rgba(250,204,21,0.5)]"></div>
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-xs font-bold text-white">${log.activity}</p>
+                  <p class="text-[9px] text-gray-500 uppercase tracking-widest mt-0.5">${log.type}</p>
+                </div>
+                <span class="text-[10px] text-gray-600 font-bold">${time}</span>
+              </div>
+            </div>
+          `;
+        });
+      } catch (err) { console.error(err); }
+    }
+
+    function formatTime(seconds) {
+      const h = Math.floor(seconds / 3600);
+      const m = Math.floor((seconds % 3600) / 60);
+      return `${h}h ${m}m`;
+    }
+
+    fetchEmployees();
+  </script>
+</body>
+</html>

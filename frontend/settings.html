@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System Settings - Velvorax</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://unpkg.com/feather-icons"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api-config.js"></script>
+  <script>
+    if (!VelvoraxAuth.isAuthenticated()) window.location.href = 'login.html';
+  </script>
+  <style>
+    .glass-card {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+    }
+    .settings-nav-link {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      border-radius: 12px;
+      color: #94a3b8;
+      transition: all 0.2s;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .settings-nav-link:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: white;
+    }
+    .settings-nav-link.active {
+      background: rgba(250, 204, 21, 0.1);
+      color: #facc15;
+    }
+    input, select, textarea {
+      background: rgba(255, 255, 255, 0.05) !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      color: white !important;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: #facc15 !important;
+      outline: none;
+    }
+    /* Toggle Switch */
+    .switch {
+      position: relative; display: inline-block; width: 44px; height: 22px;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; cursor: pointer; inset: 0;
+      background-color: rgba(255,255,255,0.1); transition: .4s; border-radius: 34px;
+    }
+    .slider:before {
+      position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px;
+      background-color: white; transition: .4s; border-radius: 50%;
+    }
+    input:checked + .slider { background-color: #facc15; }
+    input:checked + .slider:before { transform: translateX(22px); }
+  </style>
+</head>
+<body class="antialiased bg-[#02020a] h-screen overflow-hidden flex text-gray-300">
+
+<!-- Sidebar -->
+<aside class="sidebar w-64 border-r border-white/5 bg-[#030308] flex flex-col shrink-0">
+  <div class="p-8 border-b border-white/5">
+    <a href="dashboard-super.html" class="flex items-center group">
+      <div class="brand-logo-box group-hover:scale-105 transition-transform">
+        <img src="assets/logo.jpg" class="w-8 h-8 rounded-full">
+      </div>
+      <div class="ml-3">
+        <h2 class="brand-text uppercase font-bold text-yellow-400">Velvorax</h2>
+        <p class="text-[0.5rem] text-gray-500 tracking-[0.2em] uppercase mt-1">Enterprise OS</p>
+      </div>
+    </a>
+  </div>
+  <nav class="flex-1 overflow-y-auto py-6 sidebar-nav scrollbar-hide px-3 space-y-1">
+    <div class="sidebar-section-title px-4 mt-6 mb-2 text-[10px] uppercase text-gray-600 font-bold tracking-[0.2em] first:mt-0">CRM</div>
+    <a href="dashboard-super.html" class="sidebar-link" id="nav-dashboard"><i data-feather="grid" class="w-4 h-4 mr-3"></i> Dashboard</a>
+    <a href="leads.html" class="sidebar-link"><i data-feather="users" class="w-4 h-4 mr-3"></i> Leads</a>
+    <a href="contacts.html" class="sidebar-link"><i data-feather="phone" class="w-4 h-4 mr-3"></i> Contacts</a>
+
+    <!-- Super Admin Only Tabs -->
+    <div id="superAdminTabs" class="hidden contents">
+        <a href="user-approvals.html" class="sidebar-link">
+            <i data-feather="user-check" class="w-4 h-4 mr-3"></i>
+            User Approvals
+        </a>
+        <a href="client-accounts.html" class="sidebar-link">
+            <i data-feather="briefcase" class="w-4 h-4 mr-3"></i>
+            Client Accounts
+        </a>
+        <a href="admin_pricing.html" class="sidebar-link">
+            <i data-feather="dollar-sign" class="w-4 h-4 mr-3"></i>
+            Pricing Plans
+        </a>
+    </div>
+
+    <a href="accounts.html" class="sidebar-link"><i data-feather="briefcase" class="w-4 h-4 mr-3"></i> Accounts</a>
+    <a href="opportunities.html" class="sidebar-link"><i data-feather="target" class="w-4 h-4 mr-3"></i> Deals</a>
+    <a href="#" onclick="alert('Goals Module Coming Soon')" class="sidebar-link"><i data-feather="award" class="w-4 h-4 mr-3"></i> Goals</a>
+
+    <div class="sidebar-section-title px-4 mt-6 mb-2 text-[10px] uppercase text-gray-600 font-bold tracking-[0.2em] first:mt-0">PERFORMANCE</div>
+    <a href="cases.html" class="sidebar-link"><i data-feather="life-buoy" class="w-4 h-4 mr-3"></i> Tickets</a>
+    <a href="tasks.html" class="sidebar-link"><i data-feather="check-square" class="w-4 h-4 mr-3"></i> Tasks</a>
+    <a href="employee_tracking.html" class="sidebar-link"><i data-feather="activity" class="w-4 h-4 mr-3"></i> Employee Tracking</a>
+    <a href="social.html" class="sidebar-link"><i data-feather="share-2" class="w-4 h-4 mr-3"></i> Social Media</a>
+    <div class="sidebar-section-title px-4 mt-6 mb-2 text-[10px] uppercase text-gray-600 font-bold tracking-[0.2em] first:mt-0">FINANCE</div>
+    <a href="invoices.html" class="sidebar-link"><i data-feather="file-text" class="w-4 h-4 mr-3"></i> Invoices</a>
+    <a href="reports.html" class="sidebar-link"><i data-feather="bar-chart-2" class="w-4 h-4 mr-3"></i> Reports</a>
+    <div class="sidebar-section-title px-4 mt-6 mb-2 text-[10px] uppercase text-gray-600 font-bold tracking-[0.2em] first:mt-0">ADMIN</div>
+    <a href="settings.html" class="sidebar-link active"><i data-feather="settings" class="w-4 h-4 mr-3"></i> Settings</a>
+  </nav>
+  <div class="p-4 border-t border-white/5">
+    <button onclick="VelvoraxAuth.logout()" class="sidebar-link text-red-500 hover:bg-red-500/10 w-full text-left flex items-center">
+      <i data-feather="log-out" class="w-4 h-4 mr-3"></i> Sign Out
+    </button>
+  </div>
+</aside>
+
+<!-- Main -->
+<main class="flex-1 overflow-hidden flex flex-col">
+  <header class="p-8 border-b border-white/5 flex justify-between items-center bg-[#050507]">
+    <div>
+      <h1 class="text-2xl font-bold text-white tracking-tight">System Configuration</h1>
+      <p class="text-xs text-gray-500 mt-1">Global workspace settings and automations</p>
+    </div>
+    <button onclick="saveAllSettings()" class="bg-yellow-400 text-black px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-yellow-400/20 hover:scale-105 transition-all">
+      Apply Global Changes
+    </button>
+  </header>
+
+  <div class="flex-1 flex overflow-hidden">
+    <!-- Sub-Nav -->
+    <aside class="w-64 border-r border-white/5 p-6 space-y-2 bg-[#08080c]/30">
+      <div onclick="switchSection('general')" class="settings-nav-link active" id="nav-general"><i data-feather="sliders" class="w-4 h-4 mr-3"></i> General</div>
+      <div onclick="switchSection('workflow')" class="settings-nav-link" id="nav-workflow"><i data-feather="zap" class="w-4 h-4 mr-3"></i> Workflow</div>
+      <div onclick="switchSection('branding')" class="settings-nav-link" id="nav-branding"><i data-feather="image" class="w-4 h-4 mr-3"></i> Branding</div>
+      <div onclick="switchSection('integrations')" class="settings-nav-link" id="nav-integrations"><i data-feather="layers" class="w-4 h-4 mr-3"></i> Connectors</div>
+      <div onclick="switchSection('data')" class="settings-nav-link" id="nav-data"><i data-feather="database" class="w-4 h-4 mr-3"></i> Data & Export</div>
+    </aside>
+
+    <!-- Scrollable Content -->
+    <div class="flex-1 overflow-y-auto p-12 space-y-16" id="settings-content">
+
+      <!-- General Section -->
+      <section id="section-general" class="space-y-8">
+        <div class="border-b border-white/5 pb-4">
+          <h2 class="text-xl font-bold text-white">General Settings</h2>
+          <p class="text-sm text-gray-500">Regional and localization preferences</p>
+        </div>
+        <div class="grid grid-cols-2 gap-8">
+          <div class="space-y-2">
+            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Base Currency</label>
+            <select id="set-currency" class="w-full px-4 py-3 rounded-xl border border-white/10">
+              <option value="INR">Indian Rupee (₹)</option>
+              <option value="USD">US Dollar ($)</option>
+            </select>
+          </div>
+          <div class="space-y-2">
+            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Workspace Timezone</label>
+            <select id="set-timezone" class="w-full px-4 py-3 rounded-xl border border-white/10">
+              <option value="Asia/Kolkata">IST (Kolkata)</option>
+              <option value="UTC">UTC (Universal)</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- Workflow Section -->
+      <section id="section-workflow" class="space-y-8 hidden">
+        <div class="border-b border-white/5 pb-4">
+          <h2 class="text-xl font-bold text-white">Automated Workflows</h2>
+          <p class="text-sm text-gray-500">Let the system handle repetitive tasks</p>
+        </div>
+        <div class="space-y-6">
+          <div class="glass-card p-6 flex justify-between items-center">
+            <div>
+              <h4 class="text-white font-bold">Auto-Convert Hot Leads</h4>
+              <p class="text-xs text-gray-500">Automatically create a deal when a lead priority is set to "Hot"</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="set-autoConvert">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="glass-card p-6 flex justify-between items-center">
+            <div>
+              <h4 class="text-white font-bold">Email Notifications</h4>
+              <p class="text-xs text-gray-500">Notify assigned employees when a new lead/task is created</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="set-emailNotify" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- Data Section -->
+      <section id="section-data" class="space-y-8 hidden">
+        <div class="border-b border-white/5 pb-4">
+          <h2 class="text-xl font-bold text-white">Data Management</h2>
+          <p class="text-sm text-gray-500">Backup and export your workspace data</p>
+        </div>
+        <div class="grid grid-cols-3 gap-4">
+          <button class="glass-card p-6 text-center hover:bg-white/5 transition-all">
+            <i data-feather="download" class="mx-auto mb-3 text-yellow-400"></i>
+            <span class="text-xs font-bold text-white uppercase tracking-widest">Export Leads</span>
+          </button>
+          <button class="glass-card p-6 text-center hover:bg-white/5 transition-all">
+            <i data-feather="download" class="mx-auto mb-3 text-yellow-400"></i>
+            <span class="text-xs font-bold text-white uppercase tracking-widest">Export Deals</span>
+          </button>
+          <button class="glass-card p-6 text-center hover:bg-white/5 transition-all">
+            <i data-feather="download" class="mx-auto mb-3 text-yellow-400"></i>
+            <span class="text-xs font-bold text-white uppercase tracking-widest">Full Backup</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Integrations Section -->
+      <section id="section-integrations" class="space-y-8 hidden">
+        <div class="border-b border-white/5 pb-4">
+          <h2 class="text-xl font-bold text-white">Lead Capture Integration</h2>
+          <p class="text-sm text-gray-500">Connect your website forms to Velvorax CRM</p>
+        </div>
+
+        <div class="space-y-6">
+          <div class="glass-card p-8">
+            <h4 class="text-white font-bold mb-4">Web-to-Lead API</h4>
+            <p class="text-xs text-gray-400 mb-6 leading-relaxed">
+              Use the following endpoint to submit leads from any external form (like Zoho Forms, Webflow, or custom HTML).
+              No authentication is required for this specific endpoint, allowing direct public submissions.
+            </p>
+
+            <div class="space-y-4">
+              <div>
+                <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-2">Your Public Form Link (Zoho Style)</label>
+                <div class="flex gap-2 mb-4">
+                  <input type="text" id="public-form-url" readonly class="flex-1 px-4 py-3 rounded-xl border border-white/10 text-xs font-mono text-yellow-400" value="Loading...">
+                  <button onclick="copyToClipboard('public-form-url')" class="bg-white/5 px-4 rounded-xl hover:bg-white/10 transition">
+                    <i data-feather="copy" class="w-4 h-4"></i>
+                  </button>
+                  <a id="preview-form-link" href="#" target="_blank" class="bg-yellow-400 text-black px-4 flex items-center rounded-xl hover:bg-yellow-300 transition">
+                    <i data-feather="external-link" class="w-4 h-4"></i>
+                  </a>
+                </div>
+
+                <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-2">Webhook / API URL</label>
+                <div class="flex gap-2">
+                  <input type="text" id="capture-url" readonly class="flex-1 px-4 py-3 rounded-xl border border-white/10 text-xs font-mono" value="Loading...">
+                  <button onclick="copyToClipboard('capture-url')" class="bg-white/5 px-4 rounded-xl hover:bg-white/10 transition">
+                    <i data-feather="copy" class="w-4 h-4"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="bg-[#050507] rounded-2xl p-6 border border-white/5">
+                <div class="flex justify-between items-center mb-4">
+                  <span class="text-[10px] font-bold text-yellow-400 uppercase tracking-widest">Sample HTML Form</span>
+                  <button onclick="copyToClipboard('sample-form-code')" class="text-gray-500 hover:text-white transition">
+                    <i data-feather="copy" class="w-4 h-4"></i>
+                  </button>
+                </div>
+                <pre id="sample-form-code" class="text-[10px] text-gray-400 font-mono overflow-x-auto">
+&lt;form action="[YOUR_CAPTURE_URL]" method="POST"&gt;
+  &lt;!-- Basic Info --&gt;
+  &lt;input type="text" name="name" placeholder="Full Name" required&gt;
+  &lt;input type="email" name="email" placeholder="Email Address" required&gt;
+  &lt;input type="text" name="phone" placeholder="Phone Number"&gt;
+
+  &lt;!-- Company Details --&gt;
+  &lt;input type="text" name="company" placeholder="Company Name"&gt;
+  &lt;input type="text" name="businessType" placeholder="Business Type (e.g. Private)"&gt;
+
+  &lt;!-- Lead Details --&gt;
+  &lt;input type="text" name="address" placeholder="Address"&gt;
+  &lt;input type="number" name="budget" placeholder="Budget Amount"&gt;
+
+  &lt;select name="priority"&gt;
+    &lt;option value="Hot"&gt;Hot&lt;/option&gt;
+    &lt;option value="Warm" selected&gt;Warm&lt;/option&gt;
+    &lt;option value="Cold"&gt;Cold&lt;/option&gt;
+  &lt;/select&gt;
+
+  &lt;textarea name="requirement" placeholder="Requirement Details"&gt;&lt;/textarea&gt;
+
+  &lt;!-- Optional: Redirect after submission --&gt;
+  &lt;input type="hidden" name="redirect" value="https://yourwebsite.com/thank-you"&gt;
+
+  &lt;button type="submit"&gt;Submit&lt;/button&gt;
+&lt;/form&gt;</pre>
+              </div>
+            </div>
+              <div class="mt-6">
+                <h5 class="text-white font-bold text-sm mb-3">Company Capture URLs</h5>
+                <div id="companiesList" class="space-y-3 text-sm text-gray-300">
+                  <p class="text-gray-500">Loading company URLs...</p>
+                </div>
+              </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-6">
+            <div class="glass-card p-6">
+              <h5 class="text-white font-bold text-sm mb-2">How it works</h5>
+              <ul class="text-xs text-gray-500 space-y-2 list-disc ml-4">
+                <li>Submit data via <b>POST</b> request.</li>
+                <li>Fields supported: <code class="text-yellow-400">name</code>, <code class="text-yellow-400">email</code>, <code class="text-yellow-400">phone</code>, <code class="text-yellow-400">company</code>, <code class="text-yellow-400">message</code>.</li>
+                <li>New leads appear instantly in the <a href="leads.html" class="text-yellow-400 underline">Leads</a> module.</li>
+                <li>Source will be automatically set to "Web Form".</li>
+              </ul>
+            </div>
+            <div class="glass-card p-6">
+              <h5 class="text-white font-bold text-sm mb-2">Zapier / Make Integration</h5>
+              <p class="text-xs text-gray-500 leading-relaxed mb-4">
+                You can also use this URL as a Webhook destination in Zapier or Make.com to sync leads from 1000+ other apps.
+              </p>
+              <button class="w-full py-2 bg-white/5 border border-white/10 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-white/10">View Documentation</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Branding Section -->
+      <section id="section-branding" class="space-y-8 hidden">
+        <div class="border-b border-white/5 pb-4">
+          <h2 class="text-xl font-bold text-white">Branding & Identity</h2>
+          <p class="text-sm text-gray-500">Customize the look of your workspace</p>
+        </div>
+        <div class="grid grid-cols-2 gap-8">
+           <div class="space-y-4">
+              <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block">Organization Logo</label>
+              <div class="glass-card p-10 border-dashed border-2 flex flex-col items-center justify-center">
+                 <i data-feather="upload-cloud" class="w-8 h-8 text-gray-600 mb-4"></i>
+                 <p class="text-xs text-gray-500">Drag and drop logo here or click to browse</p>
+              </div>
+           </div>
+           <div class="space-y-6">
+              <div class="space-y-2">
+                <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Brand Name</label>
+                <input type="text" id="set-brandName" class="w-full px-4 py-3 rounded-xl border border-white/10" placeholder="Velvorax">
+              </div>
+              <div class="space-y-2">
+                <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Accent Color</label>
+                <div class="flex gap-4">
+                   <div class="w-10 h-10 rounded-full bg-yellow-400 ring-2 ring-white ring-offset-2 ring-offset-black cursor-pointer"></div>
+                   <div class="w-10 h-10 rounded-full bg-blue-500 cursor-pointer"></div>
+                   <div class="w-10 h-10 rounded-full bg-purple-500 cursor-pointer"></div>
+                   <div class="w-10 h-10 rounded-full bg-green-500 cursor-pointer"></div>
+                </div>
+              </div>
+           </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</main>
+
+<script>
+  feather.replace();
+
+  function switchSection(id) {
+    document.querySelectorAll('#settings-content section').forEach(s => s.classList.add('hidden'));
+    document.getElementById('section-' + id).classList.remove('hidden');
+    document.querySelectorAll('.settings-nav-link').forEach(l => l.classList.remove('active'));
+    document.getElementById('nav-' + id).classList.add('active');
+  }
+
+  async function loadSettings() {
+    // Role-based UI visibility
+    const currentUser = VelvoraxAuth.getUser();
+    const superAdminContainer = document.getElementById('superAdminTabs');
+    if (currentUser && currentUser.role === 'super_admin') {
+      if (superAdminContainer) superAdminContainer.classList.remove('hidden');
+    } else {
+      if (superAdminContainer) superAdminContainer.classList.add('hidden');
+      const dashLink = document.getElementById('nav-dashboard');
+      if (dashLink) {
+          dashLink.href = currentUser && currentUser.role === 'staff' ? 'dashboard-user.html' : 'dashboard-client.html';
+      }
+    }
+
+    try {
+      let user = VelvoraxAuth.getUser();
+      let companyId = user?.companyId;
+
+      // If companyId is missing in local storage, fetch it from profile
+      if (!companyId) {
+        const token = localStorage.getItem("token");
+        const profileRes = await fetch(`${CONFIG.API_BASE_URL}/api/auth/me`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (profileRes.ok) {
+          const profileData = await profileRes.json();
+          companyId = profileData.companyId;
+          // Update local session
+          user.companyId = companyId;
+          localStorage.setItem('velvorax_session', JSON.stringify(user));
+        }
+      }
+
+      if (companyId) {
+        const baseUrl = CONFIG.API_BASE_URL || window.location.origin;
+        const captureUrl = `${baseUrl}/api/leads/capture/${companyId}`;
+        const publicFormUrl = `${window.location.origin}/public_form.html?id=${companyId}`;
+
+        document.getElementById('capture-url').value = captureUrl;
+        document.getElementById('public-form-url').value = publicFormUrl;
+        document.getElementById('preview-form-link').href = publicFormUrl;
+
+        // Update sample code
+        const sampleCode = document.getElementById('sample-form-code');
+        const updatedCode = sampleCode.innerHTML.replace('[YOUR_CAPTURE_URL]', captureUrl);
+        sampleCode.innerHTML = updatedCode;
+      } else {
+        document.getElementById('capture-url').value = "Not available (No Company Linked)";
+      }
+
+      // Fetch all companies and render per-company URLs
+      try {
+        const companiesRes = await fetch(`${CONFIG.API_BASE_URL}/api/user-auth/companies`);
+        if (companiesRes.ok) {
+          let companies = await companiesRes.json();
+          const list = document.getElementById('companiesList');
+          list.innerHTML = '';
+
+          // Filter based on role: Super Admin sees all, others see only their own company
+          const currentUser = VelvoraxAuth.getUser();
+          if (currentUser && currentUser.role !== 'super_admin') {
+            const userCompanyId = currentUser.companyId;
+            companies = companies.filter(c => (c._id || c.id) === userCompanyId);
+          }
+
+          if (companies.length === 0) {
+            list.innerHTML = '<p class="text-gray-500 italic">No company connectors available for your account.</p>';
+          }
+
+          companies.forEach(c => {
+            const cid = c._id || c.id;
+            const cap = `${CONFIG.API_BASE_URL}/api/leads/capture/${cid}`;
+            const pub = `${window.location.origin}/public_form.html?id=${cid}`;
+            const item = document.createElement('div');
+            item.className = 'glass-card p-4 flex items-center justify-between border-white/5';
+            item.innerHTML = `
+              <div class="min-w-0 mr-4">
+                <div class="text-[13px] font-bold text-white truncate">${c.name || c.companyName || 'Company'}</div>
+                <div class="text-[11px] text-gray-400 truncate">Capture: <span class="text-yellow-400">${cap}</span></div>
+                <div class="text-[11px] text-gray-400 truncate">Public Form: <span class="text-yellow-400">${pub}</span></div>
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                <button class="px-3 py-2 rounded bg-white/5 text-xs" data-cap="${cap}">Copy Capture</button>
+                <button class="px-3 py-2 rounded bg-white/5 text-xs" data-sample="${cap}">Copy Sample</button>
+                <a class="px-3 py-2 rounded bg-yellow-400 text-xs text-black" href="${pub}" target="_blank">Preview</a>
+              </div>
+            `;
+
+            // attach handlers
+            item.querySelectorAll('button')[0].addEventListener('click', (ev) => copyToClipboardValue(ev.target.getAttribute('data-cap')));
+            item.querySelectorAll('button')[1].addEventListener('click', (ev) => {
+              const s = generateSampleForm(ev.target.getAttribute('data-sample'));
+              copyToClipboardValue(s);
+              alert('Sample form HTML copied to clipboard');
+            });
+
+            list.appendChild(item);
+          });
+        }
+      } catch (err) {
+        console.error('Failed to load companies:', err);
+      }
+
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${CONFIG.API_BASE_URL}/api/settings`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const settings = await res.json();
+      if(settings) {
+        document.getElementById('set-currency').value = settings.currency || 'INR';
+        document.getElementById('set-timezone').value = settings.timezone || 'Asia/Kolkata';
+        document.getElementById('set-autoConvert').checked = settings.leadAutoConversion || false;
+        document.getElementById('set-emailNotify').checked = settings.emailNotifications !== false;
+      }
+    } catch (err) { console.error(err); }
+  }
+
+  async function saveAllSettings() {
+    const data = {
+      currency: document.getElementById('set-currency').value,
+      timezone: document.getElementById('set-timezone').value,
+      leadAutoConversion: document.getElementById('set-autoConvert').checked,
+      emailNotifications: document.getElementById('set-emailNotify').checked
+    };
+
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${CONFIG.API_BASE_URL}/api/settings/general`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+        body: JSON.stringify(data)
+      });
+      if(res.ok) alert('Settings applied successfully');
+    } catch (err) { alert('Error saving settings'); }
+  }
+
+  function copyToClipboard(id) {
+    const copyText = document.getElementById(id);
+    const textToCopy = copyText.tagName === 'INPUT' ? copyText.value : copyText.innerText;
+
+    navigator.clipboard.writeText(textToCopy).then(() => {
+      alert('Copied to clipboard!');
+    }).catch(err => {
+      console.error('Failed to copy: ', err);
+    });
+  }
+
+  function generateSampleForm(captureUrl) {
+    return `<form action="${captureUrl}" method="POST">\n  <input type="text" name="name" placeholder="Full Name" required>\n  <input type="email" name="email" placeholder="Email Address">\n  <input type="text" name="phone" placeholder="Phone">\n  <input type="text" name="company" placeholder="Company">\n  <textarea name="requirement" placeholder="Requirement"></textarea>\n  <button type="submit">Submit</button>\n</form>`;
+  }
+
+  function copyToClipboardValue(text) {
+    navigator.clipboard.writeText(text).then(() => {
+      // silent success
+    }).catch(err => console.error('Copy failed', err));
+  }
+
+  loadSettings();
+</script>
+
+</body>
+</html>

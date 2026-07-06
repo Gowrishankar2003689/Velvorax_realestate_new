@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pricing Management - Velvorax Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://unpkg.com/feather-icons"></script>
+  <style>
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1.25rem;
+      color: #6b7280;
+      border-radius: 0.75rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-left: 3px solid transparent;
+      margin: 0.25rem 0.5rem;
+    }
+    .sidebar-link:hover {
+      background: rgba(255, 215, 0, 0.03);
+      color: #ffffff;
+    }
+    .sidebar-link.active {
+      background: rgba(255, 215, 0, 0.08);
+      color: #FFD700;
+      border-left-color: #FFD700;
+      box-shadow: inset 10px 0 20px -10px rgba(255, 215, 0, 0.1);
+    }
+    .glass-card {
+      background: rgba(10, 10, 35, 0.4);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 1.5rem;
+    }
+    input, select {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: white;
+      outline: none;
+      transition: all 0.3s;
+    }
+    input:focus {
+      border-color: #FFD700;
+      background: rgba(255,255,255,0.05);
+    }
+  </style>
+  <script src="js/config.js"></script>
+</head>
+<body class="antialiased bg-[#02020a] h-screen overflow-hidden flex text-gray-300">
+
+<!-- Sidebar -->
+<aside class="sidebar w-64 border-r border-white/5 bg-[#030308] flex flex-col shrink-0">
+  <div class="p-8 border-b border-white/5">
+    <a href="dashboard-super.html" class="flex items-center group">
+      <div class="brand-logo-box group-hover:scale-105 transition-transform">
+        <img src="assets/logo.jpg" class="w-8 h-8 rounded-full">
+      </div>
+      <div class="ml-3">
+        <h2 class="brand-text uppercase font-bold text-yellow-400">Velvorax</h2>
+        <p class="text-[0.5rem] text-gray-500 tracking-[0.2em] uppercase mt-1">Enterprise OS</p>
+      </div>
+    </a>
+  </div>
+  <nav id="mainSidebarNav" class="flex-1 overflow-y-auto py-6 sidebar-nav scrollbar-hide px-3 space-y-1">
+    <div class="sidebar-section-title px-4 mt-6 mb-2 text-[10px] uppercase text-gray-600 font-bold tracking-[0.2em] first:mt-0">CRM</div>
+    <a href="dashboard-super.html" class="sidebar-link" id="nav-dashboard"><i data-feather="grid" class="w-4 h-4 mr-3"></i> Dashboard</a>
+    <a href="leads.html" class="sidebar-link"><i data-feather="users" class="w-4 h-4 mr-3"></i> Leads</a>
+    <a href="contacts.html" class="sidebar-link"><i data-feather="phone" class="w-4 h-4 mr-3"></i> Contacts</a>
+
+    <!-- Super Admin Only Tabs -->
+    <div id="superAdminTabs" class="hidden contents">
+      <a href="user-approvals.html" class="sidebar-link">
+        <i data-feather="user-check" class="w-4 h-4 mr-3"></i>
+        User Approvals
+      </a>
+      <a href="client-accounts.html" class="sidebar-link">
+        <i data-feather="briefcase" class="w-4 h-4 mr-3"></i>
+        Client Accounts
+      </a>
+      <a href="partners.html" class="sidebar-link">
+        <i data-feather="award" class="w-4 h-4 mr-3"></i>
+        Program Partners
+      </a>
+      <a href="admin_pricing.html" class="sidebar-link active">
+        <i data-feather="dollar-sign" class="w-4 h-4 mr-3"></i>
+        Pricing Plans
+      </a>
+    </div>
+
+    <a href="accounts.html" class="sidebar-link"><i data-feather="briefcase" class="w-4 h-4 mr-3"></i> Accounts</a>
+    <a href="opportunities.html" class="sidebar-link"><i data-feather="target" class="w-4 h-4 mr-3"></i> Deals</a>
+    <a href="#" onclick="alert('Goals Module Coming Soon')" class="sidebar-link"><i data-feather="award" class="w-4 h-4 mr-3"></i> Goals</a>
+
+    <div class="sidebar-section-title px-4 mt-6 mb-2 text-[10px] uppercase text-gray-600 font-bold tracking-[0.2em] first:mt-0">PERFORMANCE</div>
+    <a href="cases.html" class="sidebar-link"><i data-feather="life-buoy" class="w-4 h-4 mr-3"></i> Tickets</a>
+    <a href="tasks.html" class="sidebar-link"><i data-feather="check-square" class="w-4 h-4 mr-3"></i> Tasks</a>
+    <a href="employee_tracking.html" class="sidebar-link"><i data-feather="activity" class="w-4 h-4 mr-3"></i> Employee Tracking</a>
+    <a href="social.html" class="sidebar-link"><i data-feather="share-2" class="w-4 h-4 mr-3"></i> Social Media</a>
+    <div class="sidebar-section-title px-4 mt-6 mb-2 text-[10px] uppercase text-gray-600 font-bold tracking-[0.2em] first:mt-0">FINANCE</div>
+    <a href="invoices.html" class="sidebar-link"><i data-feather="file-text" class="w-4 h-4 mr-3"></i> Invoices</a>
+    <a href="reports.html" class="sidebar-link"><i data-feather="bar-chart-2" class="w-4 h-4 mr-3"></i> Reports</a>
+    <div class="sidebar-section-title px-4 mt-6 mb-2 text-[10px] uppercase text-gray-600 font-bold tracking-[0.2em] first:mt-0">ADMIN</div>
+    <a href="settings.html" class="sidebar-link"><i data-feather="settings" class="w-4 h-4 mr-3"></i> Settings</a>
+
+  </nav>
+  <div class="p-4 border-t border-white/5">
+    <button onclick="VelvoraxAuth.logout()" class="sidebar-link text-red-500 hover:bg-red-500/10 w-full text-left flex items-center">
+      <i data-feather="log-out" class="w-4 h-4 mr-3"></i> Sign Out
+    </button>
+  </div>
+</aside>
+
+<!-- Company Sidebar (Super Admin Only) -->
+<aside id="companySidebar" class="hidden w-72 border-r border-white/5 bg-[#05050a] flex flex-col shrink-0">
+  <div class="p-6 border-b border-white/5 flex justify-between items-center bg-[#08080c]">
+    <div>
+      <h3 class="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">Enterprise Folders</h3>
+      <p class="text-[9px] text-gray-600 mt-1">Business Client Segments</p>
+    </div>
+    <div class="w-8 h-8 bg-white/5 rounded-lg flex items-center justify-center">
+      <i data-feather="folder" class="w-3.5 h-3.5 text-yellow-500"></i>
+    </div>
+  </div>
+  <div class="p-4 bg-[#08080c]/50">
+    <div class="relative">
+      <i data-feather="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-600"></i>
+      <input type="text" id="companySearch" placeholder="Search clients..." class="w-full bg-white/5 border border-white/10 rounded-xl pl-9 pr-4 py-2 text-[11px] text-white focus:border-yellow-400/50 outline-none transition-all" onkeyup="filterCompanyList()">
+    </div>
+  </div>
+  <div class="flex-1 overflow-y-auto py-4 px-3 space-y-1 custom-scrollbar" id="companyList">
+    <button onclick="selectCompany(null)" id="btn-all-companies" class="company-item active w-full text-left px-4 py-3 rounded-xl flex items-center group">
+      <span class="w-8 h-8 rounded-lg bg-yellow-400/10 flex items-center justify-center mr-3 group-hover:scale-110 transition-transform">
+        <i data-feather="globe" class="w-3.5 h-3.5"></i>
+      </span>
+      <div>
+        <div class="text-[11px] font-bold uppercase tracking-wider">All Leads</div>
+        <div class="text-[9px] text-gray-600 font-medium">Global view</div>
+      </div>
+    </button>
+    <div class="sidebar-section-title px-4 mt-6 mb-2 text-[9px] uppercase text-gray-700 font-black tracking-[0.2em]">Active Clients</div>
+    <div id="companyItemsContainer" class="space-y-1">
+      <!-- Companies injected here -->
+      <div class="flex justify-center py-10">
+        <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-yellow-400"></div>
+      </div>
+    </div>
+  </div>
+</aside>
+  <!-- Main Content -->
+  <main class="flex-1 flex flex-col h-full overflow-hidden">
+    <header class="h-20 border-b border-white/5 bg-[#030308]/50 backdrop-blur-xl flex items-center justify-between px-8 z-20">
+      <div>
+        <h2 class="text-sm font-bold text-white tracking-widest uppercase">Pricing Management</h2>
+        <p class="text-[10px] text-gray-500 uppercase mt-1">Control global subscription tiers</p>
+      </div>
+      <button onclick="savePricing()" class="bg-yellow-400 text-black px-6 py-2 rounded-full text-xs font-bold hover:bg-yellow-500 transition-all flex items-center">
+        <i data-feather="save" class="w-4 h-4 mr-2"></i> Save Changes
+      </button>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-8 relative space-y-8">
+      
+      <div id="pricingGrid" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Tiers will be loaded here -->
+      </div>
+
+    </div>
+  
+  
+
+
+  
+
+
+  
+
+
+  
+
+
+  <footer class="mt-auto py-8 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4 opacity-50 hover:opacity-100 transition-opacity">
+    <p class="text-[9px] text-gray-500 uppercase tracking-widest">
+      &copy; 2026 Velvorax Enterprise OS. All rights reserved.
+    </p>
+    <div class="flex space-x-6 text-[9px] text-gray-600 uppercase tracking-widest">
+      <a href="privacy.html" class="hover:text-white transition">Privacy</a>
+      <a href="terms.html" class="hover:text-white transition">Terms</a>
+      <span class="text-green-500 flex items-center">
+        <span class="w-1 h-1 bg-green-500 rounded-full mr-1.5 animate-pulse"></span> SECURE SESSION
+      </span>
+    </div>
+  </footer>
+
+</main>
+
+  <script>
+    feather.replace();
+
+    async function loadPricing() {
+      try {
+        const res = await fetch(CONFIG.API_BASE_URL + '/api/pricing');
+        const data = await res.json();
+        
+        const grid = document.getElementById('pricingGrid');
+        grid.innerHTML = '';
+
+        // Subscription Tiers
+        const tiers = data.filter(d => !d.tier.startsWith('SETUP_'));
+        const setups = data.filter(d => d.tier.startsWith('SETUP_'));
+
+        // Sort Tiers: Basic, Growth, Pro
+        const order = ['Basic', 'Growth', 'Pro'];
+        tiers.sort((a, b) => order.indexOf(a.tier) - order.indexOf(b.tier));
+
+        tiers.forEach(tier => {
+          grid.innerHTML += `
+            <div class="glass-card p-8 border-white/5 border relative group overflow-hidden">
+              <h3 class="text-xl font-bold text-yellow-400 mb-6 uppercase tracking-widest">${tier.tier}</h3>
+              <div class="space-y-6">
+                <div class="space-y-2">
+                  <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Monthly Cost (INR)</label>
+                  <div class="flex items-center">
+                    <span class="text-xl font-bold text-white mr-2">₹</span>
+                    <input type="number" id="inr-${tier.tier}" value="${tier.inr}" oninput="convertMonthly('${tier.tier}')" class="w-full px-4 py-2 rounded-lg font-bold text-white text-lg">
+                  </div>
+                </div>
+                <div class="space-y-2">
+                  <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Monthly Cost (USD) - Auto calculated</label>
+                  <div class="flex items-center">
+                    <span class="text-xl font-bold text-white mr-2">$</span>
+                    <input type="number" id="usd-${tier.tier}" value="${tier.usd}" readonly class="w-full px-4 py-2 rounded-lg font-bold text-gray-500 text-lg bg-white/5 cursor-not-allowed">
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+
+        // Add Setup Packages Section
+        grid.innerHTML += `
+          <div class="col-span-full mt-12 mb-6">
+            <h2 class="text-sm font-bold text-white tracking-widest uppercase border-l-4 border-yellow-400 pl-4">One-Time Setup Packages</h2>
+          </div>
+        `;
+
+        setups.forEach(setup => {
+          const displayName = setup.tier === 'SETUP_STANDARD' ? 'Standard Setup' : 'Advanced Custom Setup';
+          grid.innerHTML += `
+            <div class="glass-card p-8 border-yellow-400/20 border relative group overflow-hidden md:col-span-1">
+              <h3 class="text-xl font-bold text-yellow-400 mb-6 uppercase tracking-widest">${displayName}</h3>
+              <div class="space-y-6">
+                <div class="space-y-2">
+                  <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Setup Cost (INR)</label>
+                  <div class="flex items-center">
+                    <span class="text-xl font-bold text-white mr-2">₹</span>
+                    <input type="text" id="setupInr-${setup.tier}" value="${setup.setupInr || ''}" oninput="convertSetup('${setup.tier}')" placeholder="e.g. 2,50,000 or 3,50,000 - 5,00,000" class="w-full px-4 py-2 rounded-lg font-bold text-white">
+                  </div>
+                </div>
+                <div class="space-y-2">
+                  <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Setup Cost (USD) - Auto calculated</label>
+                  <div class="flex items-center">
+                    <span class="text-xl font-bold text-white mr-2">$</span>
+                    <input type="text" id="setupUsd-${setup.tier}" value="${setup.setupUsd || ''}" readonly class="w-full px-4 py-2 rounded-lg font-bold text-gray-500 bg-white/5 cursor-not-allowed">
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+
+        // Auto-calculate on load
+        tiers.forEach(t => convertMonthly(t.tier));
+        setups.forEach(s => convertSetup(s.tier));
+
+        feather.replace();
+      } catch (err) {
+        console.error('Error loading pricing:', err);
+      }
+    }
+
+    const CONVERSION_RATE = 83; // 1 USD = 83 INR (approx)
+
+    function convertMonthly(tier) {
+      const inrInput = document.getElementById(`inr-${tier}`);
+      const usdInput = document.getElementById(`usd-${tier}`);
+      if (inrInput && usdInput) {
+        const inrVal = parseFloat(inrInput.value) || 0;
+        usdInput.value = Math.round(inrVal / CONVERSION_RATE);
+      }
+    }
+
+    function convertSetup(tier) {
+      const inrInput = document.getElementById(`setupInr-${tier}`);
+      const usdInput = document.getElementById(`setupUsd-${tier}`);
+      if (!inrInput || !usdInput) return;
+
+      const rawVal = inrInput.value;
+
+      // Check if it's a range (contains '-' or '–')
+      if (rawVal.includes('-') || rawVal.includes('–')) {
+        const parts = rawVal.split(/[-–]/);
+        const convertedParts = parts.map(p => {
+          const num = parseFloat(p.replace(/,/g, '').trim()) || 0;
+          const usd = Math.round(num / CONVERSION_RATE);
+          return usd.toLocaleString();
+        });
+        usdInput.value = convertedParts.join(' – ');
+      } else {
+        const num = parseFloat(rawVal.replace(/,/g, '').trim()) || 0;
+        const usd = Math.round(num / CONVERSION_RATE);
+        usdInput.value = usd.toLocaleString();
+      }
+    }
+
+    async function savePricing() {
+      try {
+        const res = await fetch(CONFIG.API_BASE_URL + '/api/pricing');
+        const existingData = await res.json();
+
+        const updatedTiers = existingData.map(d => {
+          if (d.tier.startsWith('SETUP_')) {
+            return {
+              tier: d.tier,
+              setupInr: document.getElementById(`setupInr-${d.tier}`).value,
+              setupUsd: document.getElementById(`setupUsd-${d.tier}`).value,
+              inr: 0, usd: 0 // Keep consistent
+            };
+          } else {
+            return {
+              tier: d.tier,
+              usd: document.getElementById(`usd-${d.tier}`).value,
+              inr: document.getElementById(`inr-${d.tier}`).value
+            };
+          }
+        });
+
+        const token = localStorage.getItem('token');
+        const saveRes = await fetch(CONFIG.API_BASE_URL + '/api/pricing/update', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-auth-token': token
+          },
+          body: JSON.stringify({ tiers: updatedTiers })
+        });
+
+        if (saveRes.ok) {
+          alert('Pricing updated successfully! Changes will reflect on the public page.');
+        } else {
+          alert('Error updating pricing.');
+        }
+      } catch (err) {
+        console.error('Error saving pricing:', err);
+      }
+    }
+
+    loadPricing();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leads Management - Velvorax</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://unpkg.com/feather-icons"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    if (!VelvoraxAuth.isAuthenticated()) window.location.href = 'login.html';
+  </script>
+  <script src="js/api-config.js"></script>
+  <style>
+    .side-panel {
+      position: fixed; top: 0; right: -400px;
+      width: 350px; height: 100%;
+      background: #08080c; border-left: 1px solid rgba(255,255,255,0.1);
+      z-index: 100; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 30px; backdrop-filter: blur(20px);
+      overflow-y: auto;
+    }
+    .side-panel.open { right: 0; }
+    .panel-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+      display: none; z-index: 90;
+    }
+    .panel-overlay.show { display: block; }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+    }
+    .sidebar-link.active {
+      background: rgba(250, 204, 21, 0.1);
+      color: #facc15;
+      border-right: 2px solid #facc15;
+    }
+    .filter-btn.active {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    select option {
+      background: #08080c;
+      color: white;
+    }
+    /* Kanban Styles */
+    .kanban-column {
+      min-width: 300px;
+      width: 300px;
+      background: rgba(255,255,255,0.02);
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      height: fit-content;
+      max-height: calc(100vh - 250px);
+    }
+    .kanban-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      cursor: grab;
+      transition: all 0.2s;
+    }
+    .kanban-card:active { cursor: grabbing; }
+    .kanban-card:hover {
+      border-color: #facc15;
+      background: rgba(255,255,255,0.08);
+    }
+    /* Horizontal scrollbar */
+#tableView::-webkit-scrollbar {
+  height: 8px;
+}
+
+#tableView::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.03);
+  border-radius: 10px;
+}
+
+#tableView::-webkit-scrollbar-thumb {
+  background: rgba(250,204,21,0.4);
+  border-radius: 10px;
+}
+
+#tableView::-webkit-scrollbar-thumb:hover {
+  background: rgba(250,204,21,0.7);
+}
+    .kanban-scroll {
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,0.1) transparent;
+      padding-bottom: 20px;
+    }
+    .kanban-scroll::-webkit-scrollbar { width: 4px; }
+    .kanban-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+
+    /* Company Sidebar Styles */
+    .company-item.active {
+      background: rgba(250, 204, 21, 0.1);
+      color: #facc15;
+      border-left: 3px solid #facc15;
+    }
+    .company-item {
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .company-item:hover:not(.active) {
+      background: rgba(255, 255, 255, 0.05);
+      color: white;
+    }
+  </style>
+</head>
+<body class="antialiased bg-[#02020a] h-screen overflow-hidden flex text-gray-300">
+
+<!-- Sidebar -->
+<aside class="sidebar w-64 border-r border-white/5 bg-[#030308] flex flex-col shrink-0">
+  <div class="p-8 border-b border-white/5">
+    <a href="dashboard-super.html" class="flex items-center group">
+      <div class="brand-logo-box group-hover:scale-105 transition-transform">
+        <img src="assets/logo.jpg" class="w-8 h-8 rounded-full">
+      </div>
+      <div class="ml-3">
+        <h2 class="brand-text uppercase font-bold text-yellow-400">Velvorax</h2>
+        <p class="text-[0.5rem] text-gray-500 tracking-[0.2em] uppercase mt-1">Enterprise OS</p>
+      </div>
+    </a>
+  </div>
+  <nav id="mainSidebarNav" class="flex-1 overflow-y-auto py-6 sidebar-nav scrollbar-hide px-3 space-y-1">
+    <div class="sidebar-section-title px-4 mt-6 mb-2 text-[10px] uppercase text-gray-600 font-bold tracking-[0.2em] first:mt-0">CRM</div>
+    <a href="dashboard-super.html" class="sidebar-link" id="nav-dashboard"><i data-feather="grid" class="w-4 h-4 mr-3"></i> Dashboard</a>
+    <a href="leads.html" class="sidebar-link active"><i data-feather="users" class="w-4 h-4 mr-3"></i> Leads</a>
+    <a href="contacts.html" class="sidebar-link"><i data-feather="phone" class="w-4 h-4 mr-3"></i> Contacts</a>
+
+    <!-- Super Admin Only Tabs -->
+    <div id="superAdminTabs" class="hidden contents">
+        <a href="user-approvals.html" class="sidebar-link">
+            <i data-feather="user-check" class="w-4 h-4 mr-3"></i>
+            User Approvals
+        </a>
+        <a href="client-accounts.html" class="sidebar-link">
+            <i data-feather="briefcase" class="w-4 h-4 mr-3"></i>
+            Client Accounts
+        </a>
+        <a href="partners.html" class="sidebar-link">
+            <i data-feather="award" class="w-4 h-4 mr-3"></i>
+            Program Partners
+        </a>
+        <a href="admin_pricing.html" class="sidebar-link">
+            <i data-feather="dollar-sign" class="w-4 h-4 mr-3"></i>
+            Pricing Plans
+        </a>
+    </div>
+
+    <a href="accounts.html" class="sidebar-link"><i data-feather="briefcase" class="w-4 h-4 mr-3"></i> Accounts</a>
+    <a href="opportunities.html" class="sidebar-link"><i data-feather="target" class="w-4 h-4 mr-3"></i> Deals</a>
+    <a href="#" onclick="alert('Goals Module Coming Soon')" class="sidebar-link"><i data-feather="award" class="w-4 h-4 mr-3"></i> Goals</a>
+
+    <div class="sidebar-section-title px-4 mt-6 mb-2 text-[10px] uppercase text-gray-600 font-bold tracking-[0.2em] first:mt-0">PERFORMANCE</div>
+    <a href="cases.html" class="sidebar-link"><i data-feather="life-buoy" class="w-4 h-4 mr-3"></i> Tickets</a>
+    <a href="tasks.html" class="sidebar-link"><i data-feather="check-square" class="w-4 h-4 mr-3"></i> Tasks</a>
+    <a href="employee_tracking.html" class="sidebar-link"><i data-feather="activity" class="w-4 h-4 mr-3"></i> Employee Tracking</a>
+    <a href="social.html" class="sidebar-link"><i data-feather="share-2" class="w-4 h-4 mr-3"></i> Social Media</a>
+    <div class="sidebar-section-title px-4 mt-6 mb-2 text-[10px] uppercase text-gray-600 font-bold tracking-[0.2em] first:mt-0">FINANCE</div>
+    <a href="invoices.html" class="sidebar-link"><i data-feather="file-text" class="w-4 h-4 mr-3"></i> Invoices</a>
+    <a href="reports.html" class="sidebar-link"><i data-feather="bar-chart-2" class="w-4 h-4 mr-3"></i> Reports</a>
+    <div class="sidebar-section-title px-4 mt-6 mb-2 text-[10px] uppercase text-gray-600 font-bold tracking-[0.2em] first:mt-0">ADMIN</div>
+    <a href="settings.html" class="sidebar-link"><i data-feather="settings" class="w-4 h-4 mr-3"></i> Settings</a>
+  </nav>
+  <div class="p-4 border-t border-white/5">
+    <button onclick="VelvoraxAuth.logout()" class="sidebar-link text-red-500 hover:bg-red-500/10 w-full text-left flex items-center">
+      <i data-feather="log-out" class="w-4 h-4 mr-3"></i> Sign Out
+    </button>
+  </div>
+</aside>
+
+<!-- Company Sidebar (Super Admin Only) -->
+<aside id="companySidebar" class="hidden w-72 border-r border-white/5 bg-[#05050a] flex flex-col shrink-0">
+  <div class="p-6 border-b border-white/5 flex justify-between items-center bg-[#08080c]">
+    <div>
+      <h3 class="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">Enterprise Folders</h3>
+      <p class="text-[9px] text-gray-600 mt-1">Business Client Segments</p>
+    </div>
+    <div class="w-8 h-8 bg-white/5 rounded-lg flex items-center justify-center">
+      <i data-feather="folder" class="w-3.5 h-3.5 text-yellow-500"></i>
+    </div>
+  </div>
+  <div class="p-4 bg-[#08080c]/50">
+    <div class="relative">
+      <i data-feather="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-600"></i>
+      <input type="text" id="companySearch" placeholder="Search clients..." class="w-full bg-white/5 border border-white/10 rounded-xl pl-9 pr-4 py-2 text-[11px] text-white focus:border-yellow-400/50 outline-none transition-all" onkeyup="filterCompanyList()">
+    </div>
+  </div>
+  <div class="flex-1 overflow-y-auto py-4 px-3 space-y-1 custom-scrollbar" id="companyList">
+    <button onclick="selectCompany(null)" id="btn-all-companies" class="company-item active w-full text-left px-4 py-3 rounded-xl flex items-center group">
+      <span class="w-8 h-8 rounded-lg bg-yellow-400/10 flex items-center justify-center mr-3 group-hover:scale-110 transition-transform">
+        <i data-feather="globe" class="w-3.5 h-3.5"></i>
+      </span>
+      <div>
+        <div class="text-[11px] font-bold uppercase tracking-wider">All Leads</div>
+        <div class="text-[9px] text-gray-600 font-medium">Global view</div>
+      </div>
+    </button>
+    <div class="sidebar-section-title px-4 mt-6 mb-2 text-[9px] uppercase text-gray-700 font-black tracking-[0.2em]">Active Clients</div>
+    <div id="companyItemsContainer" class="space-y-1">
+      <!-- Companies injected here -->
+      <div class="flex justify-center py-10">
+        <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-yellow-400"></div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- Main Content -->
+<main class="flex-1 overflow-y-auto bg-[#050505] relative">
+  <div class="p-8">
+    <!-- Header -->
+    <header class="flex flex-wrap items-center justify-between gap-6 mb-8">
+      <div class="flex items-center gap-4">
+        <h1 class="text-4xl font-bold text-white tracking-tight">Leads</h1>
+        <span class="text-sm text-gray-600 mt-2 font-medium" id="leadCountText">0 of 0 leads</span>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-4">
+        <div class="flex bg-white/5 p-1 rounded-xl border border-white/10">
+          <button onclick="switchView('table')" id="tableBtn" class="flex items-center px-4 py-2 rounded-lg bg-white/10 text-white text-xs font-bold transition-all">
+            <i data-feather="list" class="w-3.5 h-3.5 mr-2"></i> Table
+          </button>
+          <button onclick="switchView('kanban')" id="kanbanBtn" class="flex items-center px-4 py-2 rounded-lg text-gray-500 hover:text-white text-xs font-bold transition-all">
+            <i data-feather="grid" class="w-3.5 h-3.5 mr-2"></i> Kanban
+          </button>
+        </div>
+
+        <div class="flex bg-white/5 p-1.5 rounded-2xl border border-white/5 backdrop-blur-md" id="quickFilters">
+          <button onclick="setQuickFilter('all')" id="btn-all" class="px-6 py-2 rounded-xl text-gray-500 hover:text-white text-[10px] font-black uppercase tracking-widest transition-all filter-btn active">All <span id="chip-all" class="ml-1 opacity-50">0</span></button>
+          <button onclick="setQuickFilter('open')" id="btn-open" class="px-6 py-2 rounded-xl text-gray-500 hover:text-white text-[10px] font-black uppercase tracking-widest transition-all filter-btn">Open <span id="chip-open" class="ml-1 opacity-50">0</span></button>
+          <button onclick="setQuickFilter('lost')" id="btn-lost" class="px-6 py-2 rounded-xl text-gray-500 hover:text-white text-[10px] font-black uppercase tracking-widest transition-all filter-btn">Lost <span id="chip-lost" class="ml-1 opacity-50">0</span></button>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button onclick="toggleSidePanel('filterPanel')" class="flex items-center px-4 py-2.5 bg-white/5 hover:bg-white/10 text-white text-xs font-bold rounded-xl border border-white/10 transition-all">
+            <i data-feather="filter" class="w-3.5 h-3.5 mr-2 text-yellow-500"></i> Filters
+          </button>
+          <button onclick="toggleSidePanel('columnPanel')" class="flex items-center px-4 py-2.5 bg-white/5 hover:bg-white/10 text-white text-xs font-bold rounded-xl border border-white/10 transition-all">
+            <i data-feather="eye" class="w-3.5 h-3.5 mr-2 text-yellow-500"></i> Columns <span id="colCount" class="ml-2 text-[8px] bg-yellow-500 text-black px-1.5 py-0.5 rounded-md shadow-lg shadow-yellow-500/20">14/14</span>
+          </button>
+          <button onclick="openAddModal()" class="btn-primary-theme flex items-center px-5 py-2.5 rounded-xl text-xs font-bold shadow-lg shadow-yellow-400/20">
+            <i data-feather="plus" class="w-4 h-4 mr-2"></i> New Lead
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Leads Table -->
+    <!-- Leads Table -->
+    <div id="tableView" class="overflow-x-auto pb-6">
+
+      <table class="min-w-[1800px] w-full text-left border-separate border-spacing-y-4">        <!-- TABLE HEADERS -->
+        <!-- REPLACE YOUR <thead><tr> SECTION WITH THIS -->
+        <!-- ========================= -->
+
+        <thead>
+        <tr class="text-gray-400 text-[11px] font-bold uppercase tracking-widest px-6">
+          <th class="pb-2 pl-4">Lead ID</th>
+          <th class="pb-2">Full Name</th>
+          <th class="pb-2">Company</th>
+          <th class="pb-2">Contact</th>
+          <th class="pb-2">Status</th>
+          <th class="pb-2">Priority</th>
+          <th class="pb-2">Source</th>
+          <th class="pb-2">Business Type</th>
+          <th class="pb-2">Requirement</th>
+          <th class="pb-2">Address</th>
+          <th class="pb-2">Budget</th>
+          <th class="pb-2">Assigned</th>
+          <th class="pb-2">Follow-up</th>
+          <th class="pb-2 text-center">Activity</th>
+          <th class="pb-2 text-center">Notes</th>
+          <th class="pb-2 text-right pr-4">Actions</th>
+        </tr>
+        </thead>
+        <tbody id="leadsTableBody" class="text-[13px]">
+          <!-- Dynamic content -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Kanban View -->
+    <div id="kanbanView" class="hidden overflow-x-auto pb-6">
+      <div class="flex gap-6 min-w-max" id="kanbanBoard">
+        <!-- Columns will be injected here -->
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="hidden p-32 text-center">
+      <div class="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-white/10">
+        <i data-feather="database" class="w-8 h-8 text-gray-700"></i>
+      </div>
+      <p class="text-gray-500 font-bold uppercase tracking-[0.2em] text-xs">No leads found</p>
+    </div>
+  </div>
+
+  <!-- Panels Overlay -->
+  <div id="panelOverlay" class="panel-overlay" onclick="closeAllPanels()"></div>
+
+  <!-- Filter Panel -->
+  <div id="filterPanel" class="side-panel">
+    <div class="flex justify-between items-center mb-8">
+      <h3 class="text-xl font-bold text-white">Filters</h3>
+      <button onclick="closeAllPanels()" class="text-gray-500 hover:text-white"><i data-feather="x"></i></button>
+    </div>
+    <form id="filterForm" class="space-y-6">
+      <div class="space-y-2">
+        <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Status</label>
+        <select id="filterStatus" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-yellow-400 outline-none">
+          <option value="">All Statuses</option>
+          <option value="New">New</option>
+          <option value="Assigned">Assigned</option>
+          <option value="In Process">In Process</option>
+          <option value="Converted">Converted</option>
+          <option value="Recycled">Recycled</option>
+          <option value="Closed">Closed</option>
+        </select>
+      </div>
+      <div class="space-y-2">
+        <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Priority</label>
+        <select id="filterPriority" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-yellow-400 outline-none">
+          <option value="">All Priorities</option>
+          <option value="Hot">Hot</option>
+          <option value="Warm">Warm</option>
+          <option value="Cold">Cold</option>
+        </select>
+      </div>
+      <div class="space-y-2">
+        <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Lead Source</label>
+        <select id="filterSource" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-yellow-400 outline-none">
+          <option value="">All Sources</option>
+          <option value="LinkedIn">LinkedIn</option>
+          <option value="Instagram">Instagram</option>
+          <option value="YouTube">YouTube</option>
+          <option value="Twitter">Twitter</option>
+          <option value="WhatsApp">WhatsApp</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <!-- ========================= -->
+      <!-- ADD THIS INSIDE ADD LEAD FORM -->
+      <!-- PLACE AFTER WHATSAPP FIELD -->
+      <!-- ========================= -->
+
+      <div class="grid grid-cols-2 gap-4">
+        <div class="space-y-2">
+          <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Min Budget</label>
+          <input type="number" id="filterMinBudget" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-yellow-400 outline-none">
+        </div>
+        <div class="space-y-2">
+          <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Max Budget</label>
+          <input type="number" id="filterMaxBudget" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-yellow-400 outline-none">
+        </div>
+      </div>
+      <div class="space-y-2">
+        <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Date Range (Created)</label>
+        <div class="grid grid-cols-2 gap-2">
+          <input type="date" id="filterStartDate" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[10px] text-white focus:border-yellow-400 outline-none">
+          <input type="date" id="filterEndDate" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[10px] text-white focus:border-yellow-400 outline-none">
+        </div>
+      </div>
+      <div class="space-y-2">
+        <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Assigned Employee</label>
+        <select id="filterAssignedTo" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-yellow-400 outline-none">
+          <option value="">All Employees</option>
+          <!-- Dynamic employees -->
+        </select>
+      </div>
+      <div class="space-y-2">
+        <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Conversion</label>
+        <select id="filterConverted" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-yellow-400 outline-none">
+          <option value="">All</option>
+          <option value="true">Converted</option>
+          <option value="false">Not Converted</option>
+        </select>
+      </div>
+      <div class="space-y-2 flex items-center gap-3">
+        <input type="checkbox" id="filterFollowUpPending" class="w-4 h-4 bg-white/5 border-white/10 rounded">
+        <label for="filterFollowUpPending" class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Follow-up Pending</label>
+      </div>
+      <div class="pt-4 flex gap-3">
+        <button type="button" onclick="resetFilters()" class="flex-1 px-4 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-bold transition-all border border-white/10">Reset</button>
+        <button type="submit" class="flex-1 px-4 py-3 bg-yellow-400 text-black rounded-xl text-xs font-bold hover:bg-yellow-500 transition-all">Apply</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Column Visibility Panel -->
+  <div id="columnPanel" class="side-panel">
+    <div class="flex justify-between items-center mb-8">
+      <h3 class="text-xl font-bold text-white">Table Columns</h3>
+      <button onclick="closeAllPanels()" class="text-gray-500 hover:text-white"><i data-feather="x"></i></button>
+    </div>
+    <div class="space-y-4" id="columnToggleList">
+      <label class="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 cursor-pointer">
+        <span class="text-xs font-bold text-gray-400 uppercase">Lead ID</span>
+        <input type="checkbox" checked onchange="toggleColumn(0)" class="w-4 h-4 accent-yellow-400">
+      </label>
+      <label class="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 cursor-pointer">
+        <span class="text-xs font-bold text-gray-400 uppercase">Full Name</span>
+        <input type="checkbox" checked onchange="toggleColumn(1)" class="w-4 h-4 accent-yellow-400">
+      </label>
+      <label class="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 cursor-pointer">
+        <span class="text-xs font-bold text-gray-400 uppercase">Company</span>
+        <input type="checkbox" checked onchange="toggleColumn(2)" class="w-4 h-4 accent-yellow-400">
+      </label>
+      <label class="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 cursor-pointer">
+        <span class="text-xs font-bold text-gray-400 uppercase">Contact</span>
+        <input type="checkbox" checked onchange="toggleColumn(3)" class="w-4 h-4 accent-yellow-400">
+      </label>
+      <label class="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 cursor-pointer">
+        <span class="text-xs font-bold text-gray-400 uppercase">Status</span>
+        <input type="checkbox" checked onchange="toggleColumn(4)" class="w-4 h-4 accent-yellow-400">
+      </label>
+      <label class="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 cursor-pointer">
+        <span class="text-xs font-bold text-gray-400 uppercase">Priority</span>
+        <input type="checkbox" checked onchange="toggleColumn(5)" class="w-4 h-4 accent-yellow-400">
+      </label>
+      <label class="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 cursor-pointer">
+        <span class="text-xs font-bold text-gray-400 uppercase">Source</span>
+        <input type="checkbox" checked onchange="toggleColumn(6)" class="w-4 h-4 accent-yellow-400">
+      </label>
+      <!-- Business Type -->
+      <label class="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 cursor-pointer">
+  <span class="text-xs font-bold text-gray-400 uppercase">
+    Business Type
+  </span>
+
+        <input type="checkbox"
+               checked
+               onchange="toggleColumn(7)"
+               class="w-4 h-4 accent-yellow-400">
+      </label>
+
+      <!-- Requirement -->
+      <label class="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 cursor-pointer">
+  <span class="text-xs font-bold text-gray-400 uppercase">
+    Requirement
+  </span>
+
+        <input type="checkbox"
+               checked
+               onchange="toggleColumn(8)"
+               class="w-4 h-4 accent-yellow-400">
+      </label>
+
+      <!-- Address -->
+      <label class="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 cursor-pointer">
+  <span class="text-xs font-bold text-gray-400 uppercase">
+    Address
+  </span>
+
+        <input type="checkbox"
+               checked
+               onchange="toggleColumn(9)"
+               class="w-4 h-4 accent-yellow-400">
+      </label>
+      <label class="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 cursor-pointer">
+        <span class="text-xs font-bold text-gray-400 uppercase">Requirement</span>
+        <input type="checkbox" checked onchange="toggleColumn(7)" class="w-4 h-4 accent-yellow-400">
+      </label>
+      <label class="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 cursor-pointer">
+        <span class="text-xs font-bold text-gray-400 uppercase">Budget</span>
+        <input type="checkbox" checked onchange="toggleColumn(8)" class="w-4 h-4 accent-yellow-400">
+      </label>
+      <label class="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 cursor-pointer">
+        <span class="text-xs font-bold text-gray-400 uppercase">Assigned</span>
+        <input type="checkbox" checked onchange="toggleColumn(9)" class="w-4 h-4 accent-yellow-400">
+      </label>
+      <label class="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 cursor-pointer">
+        <span class="text-xs font-bold text-gray-400 uppercase">Follow-up</span>
+        <input type="checkbox" checked onchange="toggleColumn(10)" class="w-4 h-4 accent-yellow-400">
+      </label>
+      <label class="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 cursor-pointer">
+        <span class="text-xs font-bold text-gray-400 uppercase">Activity</span>
+        <input type="checkbox" checked onchange="toggleColumn(11)" class="w-4 h-4 accent-yellow-400">
+      </label>
+      <label class="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 cursor-pointer">
+        <span class="text-xs font-bold text-gray-400 uppercase">Notes</span>
+        <input type="checkbox" checked onchange="toggleColumn(12)" class="w-4 h-4 accent-yellow-400">
+      </label>
+      <label class="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 cursor-pointer">
+        <span class="text-xs font-bold text-gray-400 uppercase">Actions</span>
+        <input type="checkbox" checked onchange="toggleColumn(13)" class="w-4 h-4 accent-yellow-400">
+      </label>
+    </div>
+  </div>
+</main>
+
+<!-- Lead Modal -->
+<div id="leadModal" class="fixed inset-0 bg-black/95 backdrop-blur-xl hidden z-[70] flex items-center justify-center p-4">
+  <div class="glass-card p-8 w-full max-w-4xl border-white/10 shadow-2xl overflow-y-auto max-h-[90vh]">
+    <div class="flex justify-between items-center mb-8">
+      <div>
+        <h3 class="text-3xl font-bold text-white tracking-tight">Register New Lead</h3>
+        <p class="text-xs text-gray-500 mt-2">Initialize lead profile for pipeline tracking.</p>
+      </div>
+      <button onclick="toggleModal('leadModal')" class="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center text-gray-500 hover:text-white transition-all border border-white/10"><i data-feather="x" class="w-5 h-5"></i></button>
+    </div>
+    <form id="addLeadForm" class="space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="space-y-2">
+          <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Full Name *</label>
+          <input type="text" id="leadName" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-yellow-400 outline-none">
+        </div>
+        <div class="space-y-2">
+          <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Company Name</label>
+          <input type="text" id="leadCompany" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-yellow-400 outline-none">
+          <input type="hidden" id="leadCompanyId">
+          <div id="leadCompanyUi" class="text-[10px] text-gray-400 mt-1"></div>
+        </div>
+        <div class="space-y-2">
+          <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Email Address</label>
+          <input type="email" id="leadEmail" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-yellow-400 outline-none">
+        </div>
+        <div class="space-y-2">
+          <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Mobile Number *</label>
+          <input type="text" id="leadPhone" required pattern="\+?[\d\s-]{10,15}" title="Please enter a valid 10-15 digit mobile number" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-yellow-400 outline-none">
+        </div>
+        <div class="space-y-2">
+          <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">WhatsApp Number</label>
+          <input type="text" id="leadWhatsapp" pattern="\+?[\d\s-]{10,15}" title="Please enter a valid 10-15 digit mobile number" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-yellow-400 outline-none">
+        </div>
+        <div class="space-y-2">
+          <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Lead Source</label>
+          <select id="leadSource" onchange="toggleOtherField('leadSource', 'leadSourceOther')" class="w-full bg-[#050505] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-yellow-400 outline-none">
+            <option value="">Select Source</option>
+            <option value="LinkedIn">LinkedIn</option>
+            <option value="Instagram">Instagram</option>
+            <option value="YouTube">YouTube</option>
+            <option value="Twitter">Twitter</option>
+            <option value="WhatsApp">WhatsApp</option>
+            <option value="Other">Other (Enter manually)</option>
+          </select>
+          <input type="text" id="leadSourceOther" class="hidden mt-2 w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-yellow-400 outline-none" placeholder="Please specify source...">
+        </div>
+        <div class="space-y-2">
+          <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Business Type</label>
+          <select id="leadBusinessType" onchange="toggleOtherField('leadBusinessType', 'leadBusinessTypeOther')" class="w-full bg-[#050505] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-yellow-400 outline-none">
+            <option value="">Select Type</option>
+            <option value="Private">Private</option>
+            <option value="Individual">Individual</option>
+            <option value="Other">Other (Enter manually)</option>
+          </select>
+          <input type="text" id="leadBusinessTypeOther" class="hidden mt-2 w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-yellow-400 outline-none" placeholder="Please specify business type...">
+        </div>
+        <div class="space-y-2">
+          <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Budget</label>
+          <input type="number" id="leadBudget" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-yellow-400 outline-none">
+        </div>
+        <div class="space-y-2">
+          <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Priority</label>
+          <select id="leadPriority" class="w-full bg-[#050505] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-yellow-400 outline-none">
+            <option value="Hot">Hot</option>
+            <option value="Warm" selected>Warm</option>
+            <option value="Cold">Cold</option>
+          </select>
+        </div>
+        <div class="space-y-2">
+          <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Lead Status</label>
+          <select id="leadStatus" class="w-full bg-[#050505] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-yellow-400 outline-none">
+            <option value="New">New</option>
+            <option value="Assigned">Assigned</option>
+            <option value="In Process">In Process</option>
+            <option value="Converted">Converted</option>
+            <option value="Recycled">Recycled</option>
+            <option value="Closed">Closed</option>
+          </select>
+        </div>
+        <div class="space-y-2">
+          <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Follow-up Date</label>
+          <input type="date" id="leadFollowUpDate" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-yellow-400 outline-none">
+        </div>
+        <div class="space-y-2">
+          <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Assigned Employee</label>
+          <select id="leadAssignedTo" class="w-full bg-[#050505] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-yellow-400 outline-none">
+            <option value="">Select Employee</option>
+            <!-- Dynamic employees -->
+          </select>
+        </div>
+
+      <div class="space-y-2 md:col-span-3">
+        <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+          Address
+        </label>
+
+        <textarea
+                id="leadAddress"
+                rows="2"
+                class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-yellow-400 outline-none resize-none"
+                placeholder="Enter full address"></textarea>
+      </div>
+        <div class="space-y-6 md:col-span-3">
+          <!-- Requirement -->
+          <div class="space-y-2">
+            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+              Requirement
+            </label>
+
+            <select id="leadRequirement"
+                    class="w-full bg-[#050505] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-yellow-400 outline-none">
+              <option value="">Select Requirement</option>
+              <option value="Website & Web Development">Website & Web Development</option>
+              <option value="Mobile App Development">Mobile App Development</option>
+              <option value="Software Development">Software Development</option>
+              <option value="UI/UX & Design">UI/UX & Design</option>
+              <option value="Digital Marketing">Digital Marketing</option>
+              <option value="Business Automation">Business Automation</option>
+              <option value="IT & Technical Services">IT & Technical Services</option>
+              <option value="Testing & Support">Testing & Support</option>
+              <option value="E-Commerce & Sales">E-Commerce & Sales</option>
+              <option value="Advanced Technologies">Advanced Technologies</option>
+              <option value="Branding & Growth">Branding & Growth</option>
+            </select>
+          </div>
+
+          <!-- Notes -->
+          <!-- Notes (FULL WIDTH) -->
+          <div class="md:col-span-3 space-y-2">
+            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+              Notes
+            </label>
+
+            <textarea
+                    id="leadNotes"
+                    rows="3"
+                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-yellow-400 outline-none resize-y"
+                    placeholder="Internal notes (If any)">
+    </textarea>
+          </div>
+        </div>
+      </div>
+
+
+      <button type="submit" class="w-full btn-primary-theme py-5 rounded-xl text-xs font-bold uppercase tracking-[0.2em] shadow-2xl shadow-yellow-400/20">Authorize & Save Lead Profile</button>
+    </form>
+  </div>
+</div>
+
+<!-- AI Email Generator Modal -->
+<div id="emailModal" class="fixed inset-0 bg-black/95 backdrop-blur-xl hidden z-[80] flex items-center justify-center p-4">
+  <div class="glass-card w-full max-w-6xl border-white/10 shadow-2xl flex flex-col max-h-[90vh]">
+    <!-- Header -->
+    <div class="p-6 border-b border-white/5 flex justify-between items-center">
+      <div class="flex items-center gap-4">
+        <div class="w-10 h-10 bg-yellow-400/10 rounded-xl flex items-center justify-center border border-yellow-400/20">
+          <i data-feather="cpu" class="w-5 h-5 text-yellow-400"></i>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold text-white tracking-tight">AI Email Composer</h3>
+          <p class="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Smart Automation for <span id="emailTargetLead" class="text-yellow-400">Prospect</span></p>
+        </div>
+      </div>
+      <button onclick="toggleModal('emailModal')" class="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center text-gray-500 hover:text-white transition-all border border-white/10">
+        <i data-feather="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <div class="flex flex-1 overflow-hidden">
+      <!-- Left: Configuration -->
+      <div class="w-1/3 border-r border-white/5 p-6 overflow-y-auto space-y-6">
+        <div class="space-y-4">
+          <div class="space-y-2">
+            <label class="text-xs font-bold text-gray-200 uppercase tracking-widest">What is this email about?</label>
+            <textarea id="emailPrompt" rows="3" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-yellow-400 outline-none resize-none text-base" placeholder="Select a suggestion below or type here..."></textarea>
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-xs font-bold text-yellow-400 uppercase tracking-[0.2em]">Quick Suggestions</label>
+            <div class="grid grid-cols-1 gap-3">
+              <button onclick="setPrompt('Welcome & Introduction: Confirm they have been added as a lead and introduce our enterprise services.')" class="text-left p-4 rounded-xl bg-white/5 border border-white/5 hover:border-yellow-400/50 hover:bg-yellow-400/5 transition-all group">
+                <p class="text-sm font-bold text-white group-hover:text-yellow-400">Welcome & Intro</p>
+                <p class="text-xs text-gray-400 mt-1 line-clamp-1">Added to company, introduce services</p>
+              </button>
+              <button onclick="setPrompt('Follow-up: Reach out after our recent discussion to answer any pending questions.')" class="text-left p-4 rounded-xl bg-white/5 border border-white/5 hover:border-yellow-400/50 hover:bg-yellow-400/5 transition-all group">
+                <p class="text-sm font-bold text-white group-hover:text-yellow-400">Follow-up Sync</p>
+                <p class="text-xs text-gray-400 mt-1 line-clamp-1">Quick check-in after previous contact</p>
+              </button>
+              <button onclick="setPrompt('Discovery Meeting: Request a 15-minute call to align our solutions with their business goals.')" class="text-left p-4 rounded-xl bg-white/5 border border-white/5 hover:border-yellow-400/50 hover:bg-yellow-400/5 transition-all group">
+                <p class="text-sm font-bold text-white group-hover:text-yellow-400">Meeting Request</p>
+                <p class="text-xs text-gray-400 mt-1 line-clamp-1">Schedule a discovery/demo session</p>
+              </button>
+              <button onclick="setPrompt('Business Proposal: Present a customized proposal based on their industry requirements.')" class="text-left p-4 rounded-xl bg-white/5 border border-white/5 hover:border-yellow-400/50 hover:bg-yellow-400/5 transition-all group">
+                <p class="text-sm font-bold text-white group-hover:text-yellow-400">Proposal Pitch</p>
+                <p class="text-xs text-gray-400 mt-1 line-clamp-1">Share ROI and custom solutions</p>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div class="space-y-2">
+            <label class="text-xs font-bold text-gray-200 uppercase tracking-widest">Tone</label>
+            <select id="emailTone" class="w-full bg-[#050505] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-yellow-400 outline-none text-sm">
+              <option value="Professional">Professional</option>
+              <option value="Friendly">Friendly</option>
+              <option value="Persuasive">Persuasive</option>
+              <option value="Cold Outreach">Cold Outreach</option>
+              <option value="Urgent">Urgent</option>
+              <option value="Warm">Warm</option>
+            </select>
+          </div>
+          <div class="space-y-2">
+            <label class="text-xs font-bold text-gray-200 uppercase tracking-widest">Length</label>
+            <select id="emailLength" class="w-full bg-[#050505] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-yellow-400 outline-none text-sm">
+              <option value="short">Short</option>
+              <option value="medium" selected>Medium</option>
+              <option value="long">Long</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <label class="text-xs font-bold text-gray-200 uppercase tracking-widest">Key Points to Include (Optional)</label>
+          <textarea id="emailBullets" rows="4" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-yellow-400 outline-none resize-none text-sm" placeholder="• Mention 20% discount&#10;• Focus on ROI&#10;• Request meeting Thursday"></textarea>
+        </div>
+
+        <button onclick="generateAIEmail()" id="generateBtn" class="w-full bg-yellow-400 text-black py-4 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-yellow-500 transition-all flex items-center justify-center gap-2">
+          <i data-feather="zap" class="w-4 h-4"></i> Generate Draft
+        </button>
+
+        <div id="refinementBox" class="hidden space-y-4 pt-4 border-t border-white/5">
+          <label class="text-[10px] font-bold text-yellow-500 uppercase tracking-widest flex items-center gap-2">
+            <i data-feather="refresh-cw" class="w-3 h-3"></i> Refine with Instructions
+          </label>
+          <div class="relative">
+            <input type="text" id="refinementInput" class="w-full bg-white/5 border border-white/10 rounded-xl pl-4 pr-12 py-3 text-sm text-white focus:border-yellow-400 outline-none" placeholder="e.g., Make it shorter, Add a joke...">
+            <button onclick="refineAIEmail()" class="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-yellow-400 hover:bg-yellow-400/10 rounded-lg transition-all">
+              <i data-feather="arrow-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Preview & Edit -->
+      <div class="flex-1 bg-black/40 p-8 overflow-y-auto flex flex-col">
+        <div id="emailLoader" class="hidden flex-1 flex flex-col items-center justify-center space-y-4">
+          <div class="w-12 h-12 border-4 border-yellow-400/20 border-t-yellow-400 rounded-full animate-spin"></div>
+          <p class="text-xs text-gray-500 font-bold uppercase tracking-[0.3em] animate-pulse">AI is thinking...</p>
+        </div>
+
+        <div id="emailPreviewArea" class="hidden flex-1 flex flex-col space-y-6">
+          <div class="space-y-2">
+            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Subject Line</label>
+            <input type="text" id="previewSubject" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white font-bold text-lg focus:border-yellow-400 outline-none">
+          </div>
+          <div class="flex-1 space-y-2 flex flex-col">
+            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Email Body</label>
+            <textarea id="previewBody" class="flex-1 w-full bg-white/5 border border-white/10 rounded-xl px-6 py-6 text-white text-base focus:border-yellow-400 outline-none resize-none leading-relaxed"></textarea>
+          </div>
+
+          <div class="flex items-center justify-between pt-6 border-t border-white/5">
+            <div class="flex items-center gap-4 text-[10px] text-gray-500 uppercase tracking-widest font-bold">
+              <span class="flex items-center gap-1.5"><i data-feather="check-circle" class="w-3 h-3 text-green-500"></i> AI Generated</span>
+              <span id="wordCount">0 words</span>
+            </div>
+            <button onclick="sendAIEmail()" id="sendEmailBtn" class="bg-white text-black px-10 py-4 rounded-xl text-xs font-black uppercase tracking-[0.2em] hover:bg-yellow-400 transition-all flex items-center gap-2 shadow-2xl">
+              <i data-feather="send" class="w-4 h-4"></i> Send Transmission
+            </button>
+          </div>
+        </div>
+
+        <div id="emailPlaceholder" class="flex-1 flex flex-col items-center justify-center text-center p-12 opacity-30">
+          <div class="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center mb-6">
+            <i data-feather="mail" class="w-10 h-10"></i>
+          </div>
+          <h4 class="text-xl font-bold text-white mb-2">Ready to Compose</h4>
+          <p class="text-sm max-w-xs">Configure your email settings on the left and click 'Generate Draft' to start the AI automation.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let allLeads = [];
+  let allEmployees = [];
+  let filters = {};
+  let currentView = 'table';
+  let editingLeadId = null;
+  let allCompanies = [];
+  let selectedCompanyId = null;
+
+  // AI Email Generator State
+  let currentEmailLead = null;
+  let emailRefinements = [];
+
+  function setPrompt(text) {
+    document.getElementById('emailPrompt').value = text;
+  }
+
+  async function openEmailModal(leadId) {
+    const lead = allLeads.find(l => l._id === leadId);
+    if (!lead) return;
+
+    currentEmailLead = lead;
+    emailRefinements = [];
+
+    document.getElementById('emailTargetLead').textContent = lead.name;
+    document.getElementById('emailPrompt').value = '';
+    document.getElementById('emailBullets').value = '';
+    document.getElementById('refinementInput').value = '';
+
+    // Reset View
+    document.getElementById('emailPlaceholder').classList.remove('hidden');
+    document.getElementById('emailPreviewArea').classList.add('hidden');
+    document.getElementById('emailLoader').classList.add('hidden');
+    document.getElementById('refinementBox').classList.add('hidden');
+
+    toggleModal('emailModal');
+    if(window.feather) feather.replace();
+  }
+
+  async function generateAIEmail() {
+    const prompt = document.getElementById('emailPrompt').value;
+    if (!prompt) return alert('Please enter what the email is about.');
+
+    const tone = document.getElementById('emailTone').value;
+    const length = document.getElementById('emailLength').value;
+    const bullets = document.getElementById('emailBullets').value;
+
+    // UI Feedback
+    document.getElementById('emailPlaceholder').classList.add('hidden');
+    document.getElementById('emailPreviewArea').classList.add('hidden');
+    document.getElementById('emailLoader').classList.remove('hidden');
+    document.getElementById('generateBtn').disabled = true;
+    document.getElementById('generateBtn').innerHTML = '<i class="animate-spin w-4 h-4"></i> Generating...';
+
+    try {
+      const res = await fetch(`${CONFIG.API_BASE_URL}/api/generate-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customRecipient: {
+            name: currentEmailLead.name,
+            email: currentEmailLead.email,
+            company: currentEmailLead.company,
+            title: currentEmailLead.title || 'Professional'
+          },
+          prompt,
+          tone,
+          length,
+          bullets,
+          refinements: emailRefinements
+        })
+      });
+
+      const data = await res.json();
+
+      if (data.subject && data.body) {
+        document.getElementById('previewSubject').value = data.subject;
+        document.getElementById('previewBody').value = data.body;
+
+        document.getElementById('emailLoader').classList.add('hidden');
+        document.getElementById('emailPreviewArea').classList.remove('hidden');
+        document.getElementById('refinementBox').classList.remove('hidden');
+
+        // Update word count
+        const words = data.body.split(/\s+/).length;
+        document.getElementById('wordCount').textContent = `${words} words`;
+      } else {
+        alert('Failed to generate email content.');
+      }
+    } catch (err) {
+      console.error('AI Generation Error:', err);
+      alert('Error connecting to AI service.');
+    } finally {
+      document.getElementById('generateBtn').disabled = false;
+      document.getElementById('generateBtn').innerHTML = '<i data-feather="zap" class="w-4 h-4"></i> Generate Draft';
+      if(window.feather) feather.replace();
+    }
+  }
+
+  async function refineAIEmail() {
+    const instruction = document.getElementById('refinementInput').value;
+    if (!instruction) return;
+
+    // Add current draft to history
+    emailRefinements.push({
+      subject: document.getElementById('previewSubject').value,
+      body: document.getElementById('previewBody').value,
+      instruction: instruction
+    });
+
+    // Clear input and trigger generation
+    document.getElementById('refinementInput').value = '';
+    await generateAIEmail();
+  }
+
+  async function sendAIEmail() {
+    const subject = document.getElementById('previewSubject').value;
+    const body = document.getElementById('previewBody').value;
+
+    if (!currentEmailLead.email) {
+      return alert('Lead does not have an email address configured.');
+    }
+
+    const sendBtn = document.getElementById('sendEmailBtn');
+    sendBtn.disabled = true;
+    sendBtn.innerHTML = '<i class="animate-spin w-4 h-4"></i> Transmitting...';
+
+    try {
+      const res = await fetch(`${CONFIG.API_BASE_URL}/api/send-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contactId: currentEmailLead._id,
+          recipientEmail: currentEmailLead.email,
+          contactName: currentEmailLead.name,
+          subject,
+          body,
+          prompt: document.getElementById('emailPrompt').value,
+          tone: document.getElementById('emailTone').value
+        })
+      });
+
+      if (res.ok) {
+        alert('Email transmitted successfully.');
+        toggleModal('emailModal');
+      } else {
+        let errorMsg = 'Unknown error';
+        try {
+          const err = await res.json();
+          errorMsg = err.error || err.msg || errorMsg;
+        } catch (parseErr) {
+          errorMsg = 'Server error (502). Please check if SMTP is configured in Render.';
+        }
+        alert('Transmission failed: ' + errorMsg);
+      }
+    } catch (err) {
+      console.error('Send Email Error:', err);
+      alert('Failed to connect to mail server.');
+    } finally {
+      sendBtn.disabled = false;
+      sendBtn.innerHTML = '<i data-feather="send" class="w-4 h-4"></i> Send Transmission';
+      if(window.feather) feather.replace();
+    }
+  }
+
+  async function checkSuperAdmin() {
+    const user = VelvoraxAuth.getUser();
+
+    // Hide Super Admin only tabs if not super_admin
+    const superAdminContainer = document.getElementById('superAdminTabs');
+    if (user && user.role === 'super_admin') {
+      if (superAdminContainer) superAdminContainer.classList.remove('hidden');
+      document.getElementById('companySidebar').classList.remove('hidden');
+      await fetchCompanies();
+    } else {
+      if (superAdminContainer) superAdminContainer.classList.add('hidden');
+      // Fix dashboard link for clients/staff
+      const dashLink = document.getElementById('nav-dashboard');
+      if (dashLink) {
+        dashLink.href = user && user.role === 'staff' ? 'dashboard-user.html' : 'dashboard-client.html';
+      }
+    }
+  }
+
+  async function fetchCompanies() {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${CONFIG.API_BASE_URL}/api/companies`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) return;
+      allCompanies = await res.json();
+      renderCompanyList();
+    } catch (err) {
+      console.error('Error fetching companies:', err);
+    }
+  }
+
+  function renderCompanyList() {
+    const container = document.getElementById('companyItemsContainer');
+    if (!container) return;
+
+    if (allCompanies.length === 0) {
+      container.innerHTML = '<p class="text-[10px] text-gray-600 px-4 italic">No companies found</p>';
+      return;
+    }
+
+    container.innerHTML = allCompanies.map(company => `
+      <button onclick="selectCompany('${company._id}')" id="comp-${company._id}" class="company-item w-full text-left px-4 py-3 rounded-xl flex items-center group">
+        <span class="w-8 h-8 rounded-lg bg-white/5 border border-white/5 flex items-center justify-center mr-3 group-hover:scale-110 transition-transform">
+          <span class="text-[10px] font-bold text-gray-500">${company.name.charAt(0).toUpperCase()}</span>
+        </span>
+        <div class="flex-1 min-w-0">
+          <div class="text-[11px] font-bold truncate">${company.name}</div>
+          <div class="text-[9px] text-gray-600 truncate">${company.industry || 'Business Client'}</div>
+        </div>
+        <i data-feather="chevron-right" class="w-3 h-3 text-gray-700 opacity-0 group-hover:opacity-100 transition-all"></i>
+      </button>
+    `).join('');
+
+    if(window.feather) feather.replace();
+  }
+
+  function filterCompanyList() {
+    const query = document.getElementById('companySearch').value.toLowerCase();
+    const container = document.getElementById('companyItemsContainer');
+    const items = container.querySelectorAll('.company-item');
+
+    items.forEach(item => {
+      const text = item.innerText.toLowerCase();
+      if (text.includes(query)) item.classList.remove('hidden');
+      else item.classList.add('hidden');
+    });
+  }
+
+  function selectCompany(companyId) {
+    selectedCompanyId = companyId;
+
+    // Update UI active state
+    document.querySelectorAll('.company-item').forEach(btn => btn.classList.remove('active'));
+    if (companyId) {
+      document.getElementById(`comp-${companyId}`).classList.add('active');
+      filters.companyId = companyId;
+    } else {
+      document.getElementById('btn-all-companies').classList.add('active');
+      delete filters.companyId;
+    }
+
+    fetchLeads();
+  }
+
+  function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
+
+  function toggleSidePanel(id) {
+    document.getElementById(id).classList.add('open');
+    document.getElementById('panelOverlay').classList.add('show');
+    if(window.feather) feather.replace();
+  }
+
+  function closeAllPanels() {
+    document.querySelectorAll('.side-panel').forEach(p => p.classList.remove('open'));
+    document.getElementById('panelOverlay').classList.remove('show');
+  }
+
+  function toggleOtherField(selectId, otherId) {
+    const select = document.getElementById(selectId);
+    const otherInput = document.getElementById(otherId);
+    if (select.value === 'Other') otherInput.classList.remove('hidden');
+    else {
+      otherInput.classList.add('hidden');
+      otherInput.value = '';
+    }
+  }
+
+  function openAddModal() {
+    editingLeadId = null;
+    document.getElementById('addLeadForm').reset();
+    document.getElementById('leadSourceOther').classList.add('hidden');
+    document.getElementById('leadBusinessTypeOther').classList.add('hidden');
+    document.querySelector('#leadModal h3').textContent = 'Register New Lead';
+    document.querySelector('#leadModal button[type="submit"]').textContent = 'Authorize & Save Lead Profile';
+    toggleModal('leadModal');
+  }
+
+  // =========================
+// REPLACE COMPLETE openEditModal()
+// =========================
+
+function openEditModal(id) {
+  const lead = allLeads.find(l => l._id === id);
+  if(!lead) return;
+
+  editingLeadId = id;
+
+  document.getElementById('leadName').value = lead.name || '';
+  document.getElementById('leadCompany').value = lead.company || '';
+  document.getElementById('leadEmail').value = lead.email || '';
+  document.getElementById('leadPhone').value = lead.phone || '';
+  document.getElementById('leadWhatsapp').value = lead.whatsapp || '';
+  document.getElementById('leadAddress').value = lead.address || '';
+
+  // Source
+  const sourceSelect = document.getElementById('leadSource');
+  const sourceOptions = Array.from(sourceSelect.options).map(opt => opt.value);
+
+  if (lead.source && !sourceOptions.includes(lead.source)) {
+    sourceSelect.value = 'Other';
+    document.getElementById('leadSourceOther').value = lead.source;
+    document.getElementById('leadSourceOther').classList.remove('hidden');
+  } else {
+    sourceSelect.value = lead.source || '';
+    document.getElementById('leadSourceOther').classList.add('hidden');
+  }
+
+  // Business Type
+  const typeSelect = document.getElementById('leadBusinessType');
+  const typeOptions = Array.from(typeSelect.options).map(opt => opt.value);
+
+  if (lead.businessType && !typeOptions.includes(lead.businessType)) {
+    typeSelect.value = 'Other';
+    document.getElementById('leadBusinessTypeOther').value = lead.businessType;
+    document.getElementById('leadBusinessTypeOther').classList.remove('hidden');
+  } else {
+    typeSelect.value = lead.businessType || '';
+    document.getElementById('leadBusinessTypeOther').classList.add('hidden');
+  }
+
+  document.getElementById('leadBudget').value = lead.budget || '';
+  document.getElementById('leadPriority').value = lead.priority || 'Warm';
+  document.getElementById('leadStatus').value = lead.status || 'New';
+
+  document.getElementById('leadFollowUpDate').value =
+    lead.followUpDate
+      ? lead.followUpDate.split('T')[0]
+      : '';
+
+  document.getElementById('leadAssignedTo').value =
+    lead.assignedTo?._id || lead.assignedTo || '';
+
+  document.getElementById('leadRequirement').value =
+    lead.requirement || '';
+
+  document.getElementById('leadNotes').value =
+    lead.notes || lead.description || '';
+
+  document.querySelector('#leadModal h3').textContent =
+    'Edit Lead Profile';
+
+  document.querySelector('#leadModal button[type="submit"]').textContent =
+    'Update & Save Lead Profile';
+
+  toggleModal('leadModal');
+}
+  async function fetchEmployees() {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${CONFIG.API_BASE_URL}/api/tasks/users/list`, {
+        headers: { 'x-auth-token': token }
+      });
+      if (!res.ok) return;
+      allEmployees = await res.json();
+      if (!Array.isArray(allEmployees)) {
+        console.error("Employees API did not return an array:", allEmployees);
+        return;
+      }
+
+      const selects = [document.getElementById('leadAssignedTo'), document.getElementById('filterAssignedTo')];
+      selects.forEach(select => {
+        if (!select) return;
+        const placeholder = select.options[0].outerHTML;
+        select.innerHTML = placeholder;
+        allEmployees.forEach(emp => {
+          const opt = document.createElement('option');
+          opt.value = emp._id;
+          opt.textContent = emp.name;
+          select.appendChild(opt);
+        });
+      });
+    } catch (err) { console.error('Error fetching employees:', err); }
+  }
+
+  async function fetchLeads() {
+    try {
+      const token = localStorage.getItem('token');
+      const queryParams = new URLSearchParams(filters).toString();
+      const res = await fetch(`${CONFIG.API_BASE_URL}/api/leads?${queryParams}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (!res.ok) throw new Error('Failed to fetch');
+      allLeads = await res.json();
+      updateCounters();
+      renderCurrentView();
+    } catch (err) {
+      console.error(err);
+      document.getElementById('leadsTableBody').innerHTML = '<tr><td colspan="14" class="text-center py-10 text-red-400">Error loading leads</td></tr>';
+    }
+  }
+
+  function updateCounters() {
+    document.getElementById('chip-all').textContent = allLeads.length;
+    document.getElementById('chip-open').textContent = allLeads.filter(l => !['Closed', 'Recycled', 'Lost'].includes(l.status)).length;
+    document.getElementById('chip-lost').textContent = allLeads.filter(l => ['Recycled', 'Lost'].includes(l.status)).length;
+    document.getElementById('leadCountText').textContent = `${allLeads.length} of ${allLeads.length} leads`;
+  }
+
+  function renderCurrentView() {
+    if (currentView === 'table') {
+      renderTable();
+    } else {
+      renderKanban();
+    }
+  }
+
+ // =========================
+// REPLACE COMPLETE renderTable()
+// =========================
+
+function renderTable() {
+
+  const tbody = document.getElementById('leadsTableBody');
+  const emptyState = document.getElementById('emptyState');
+
+  tbody.innerHTML = '';
+
+  if (allLeads.length === 0) {
+    emptyState.classList.remove('hidden');
+    return;
+  }
+
+  emptyState.classList.add('hidden');
+
+  allLeads.forEach(lead => {
+
+    const row = document.createElement('tr');
+
+    row.className =
+      "group hover:bg-white/[0.02] transition-all border-b border-white/5";
+
+    const noteText = lead.notes || lead.description || "";
+
+    const hasNotes = noteText.trim().length > 0;
+
+    const noteSnippet =
+      noteText.length > 20
+        ? noteText.substring(0, 20) + '...'
+        : noteText;
+
+    const lastActivity =
+      lead.lastActivity
+        ? new Date(lead.lastActivity).toLocaleDateString()
+        : '—';
+
+    const createdAt =
+      new Date(lead.createdAt).toLocaleDateString();
+
+    row.innerHTML = `
+
+      <td class="py-4 pl-4 font-bold text-yellow-400">
+        ${lead.leadId || 'N/A'}
+      </td>
+
+      <td class="py-4 text-white font-medium cursor-pointer hover:underline"
+          onclick="openEditModal('${lead._id}')">
+        ${lead.name}
+      </td>
+
+      <td class="py-4 text-gray-500">
+        ${lead.company || '—'}
+      </td>
+
+      <td class="py-4 text-gray-500">
+        <div class="text-xs">${lead.email || ''}</div>
+        <div class="text-[10px]">${lead.phone || ''}</div>
+      </td>
+
+      <td class="py-4">
+        <span class="px-2 py-1 bg-yellow-400/10 text-yellow-400 text-[10px] font-bold rounded uppercase">
+          ${lead.status || 'New'}
+        </span>
+      </td>
+
+      <td class="py-4">
+        <span class="text-[11px] font-bold ${getPriorityColor(lead.priority)}">
+          ${lead.priority || 'Warm'}
+        </span>
+      </td>
+
+      <td class="py-4 text-gray-500 text-xs">
+        ${lead.source || '—'}
+      </td>
+
+      <td class="py-4 text-cyan-400 text-xs font-bold">
+        ${lead.businessType || '—'}
+      </td>
+
+      <td class="py-4 text-gray-500 text-xs">
+        ${lead.requirement || '—'}
+      </td>
+
+      <td class="py-4 text-gray-400 text-xs max-w-[200px] truncate"
+          title="${lead.address || ''}">
+        ${lead.address || '—'}
+      </td>
+
+      <td class="py-4 text-gray-300 font-mono text-xs">
+        ${lead.budget ? '$' + lead.budget : '—'}
+      </td>
+
+      <td class="py-4 text-yellow-500 font-bold text-xs">
+        ${lead.assignedTo ? lead.assignedTo.name : '<span class="text-gray-600 italic">Unassigned</span>'}
+      </td>
+
+      <td class="py-4 text-gray-500 text-xs">
+        ${lead.followUpDate
+          ? new Date(lead.followUpDate).toLocaleDateString()
+          : '—'}
+      </td>
+
+      <td class="py-4 text-center text-gray-600 text-[10px]">
+        <div>Act: ${lastActivity}</div>
+        <div>Cre: ${createdAt}</div>
+      </td>
+
+      <td class="py-4 text-center">
+
+        ${hasNotes ? `
+
+          <div class="flex flex-col items-center gap-1">
+
+            <span class="text-[10px] text-yellow-100 font-bold line-clamp-1 max-w-[80px]"
+                  title="${noteText.replace(/"/g, '&quot;')}">
+
+              ${noteSnippet}
+
+            </span>
+
+            <i data-feather="file-text"
+               class="w-3.5 h-3.5 text-yellow-400 cursor-help"
+               title="${noteText.replace(/"/g, '&quot;')}"></i>
+
+          </div>
+
+        ` : '<span class="text-gray-400 text-[10px]">No notes</span>'}
+
+      </td>
+
+      <td class="py-4 text-right pr-4">
+        <button onclick="openEmailModal('${lead._id}')"
+                class="p-2 text-gray-600 hover:text-cyan-400 transition-colors" title="AI Email">
+          <i data-feather="mail" class="w-4 h-4"></i>
+        </button>
+
+        <button onclick="openEditModal('${lead._id}')"
+                class="p-2 text-gray-600 hover:text-yellow-400 transition-colors">
+          <i data-feather="edit-2" class="w-4 h-4"></i>
+        </button>
+
+        <button onclick="deleteLead('${lead._id}')"
+                class="p-2 text-gray-600 hover:text-red-500 transition-colors">
+
+          <i data-feather="trash-2" class="w-4 h-4"></i>
+
+        </button>
+
+      </td>
+
+    `;
+
+    tbody.appendChild(row);
+
+  });
+
+  applyColumnVisibility();
+
+  feather.replace();
+}
+
+  function renderKanban() {
+    const board = document.getElementById('kanbanBoard');
+    const emptyState = document.getElementById('emptyState');
+    board.innerHTML = '';
+
+    if (allLeads.length === 0) {
+      emptyState.classList.remove('hidden');
+      return;
+    }
+    emptyState.classList.add('hidden');
+
+    const statuses = ['New', 'Assigned', 'In Process', 'Converted', 'Recycled', 'Closed'];
+
+    statuses.forEach(status => {
+      const columnLeads = allLeads.filter(l => l.status === status);
+      const col = document.createElement('div');
+      col.className = 'kanban-column flex flex-col';
+      col.innerHTML = `
+        <div class="p-4 border-b border-white/5 flex justify-between items-center bg-white/5 rounded-t-2xl">
+          <h4 class="text-[10px] font-black uppercase tracking-widest text-gray-400">${status}</h4>
+          <span class="px-2 py-0.5 bg-white/5 rounded text-[10px] text-gray-500 font-bold">${columnLeads.length}</span>
+        </div>
+        <div class="p-4 kanban-scroll flex-1" ondrop="drop(event, '${status}')" ondragover="allowDrop(event)">
+          ${columnLeads.map(lead => `
+            <div class="kanban-card group" draggable="true" ondragstart="drag(event, '${lead._id}')" onclick="openEditModal('${lead._id}')">
+              <div class="flex justify-between items-start mb-3">
+                <span class="text-[9px] font-bold text-yellow-400 uppercase tracking-tighter">${lead.leadId || 'LID-000'}</span>
+                <span class="text-[9px] font-black ${getPriorityColor(lead.priority)} uppercase">${lead.priority}</span>
+              </div>
+              <h5 class="text-sm font-bold text-white mb-1 group-hover:text-yellow-400 transition-colors">${lead.name}</h5>
+              <div class="flex items-center gap-2 mb-3">
+                <p class="text-[10px] text-gray-500 line-clamp-1">${lead.company || 'Individual'}</p>
+                <button onclick="event.stopPropagation(); openEmailModal('${lead._id}')" class="p-1 hover:text-cyan-400 text-gray-600 transition-colors">
+                  <i data-feather="mail" class="w-3 h-3"></i>
+                </button>
+              </div>
+
+              ${lead.notes ? `
+                <div class="mt-2 p-2 bg-white/5 rounded-lg border border-white/5">
+                  <p class="text-[9px] text-gray-400 line-clamp-2 italic">"${lead.notes}"</p>
+                </div>
+              ` : ''}
+
+              <div class="flex items-center justify-between mt-4 pt-3 border-t border-white/5">
+                <div class="flex items-center gap-2">
+                   <div class="w-6 h-6 rounded-full bg-yellow-400/20 border border-white/10 flex items-center justify-center text-[10px] font-bold text-yellow-500" title="${lead.assignedTo?.name || 'Unassigned'}">
+                    ${lead.assignedTo?.name ? lead.assignedTo.name.charAt(0) : '?'}
+                   </div>
+                   <span class="text-[9px] text-gray-500 font-bold">${lead.assignedTo?.name || 'Unassigned'}</span>
+                </div>
+                <div class="text-[9px] text-gray-400 font-medium">
+                  ${lead.budget ? '$' + lead.budget : 'No Budget'}
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      board.appendChild(col);
+    });
+    feather.replace();
+  }
+
+  function allowDrop(ev) { ev.preventDefault(); }
+  function drag(ev, id) { ev.dataTransfer.setData("leadId", id); }
+  async function drop(ev, newStatus) {
+    ev.preventDefault();
+    const id = ev.dataTransfer.getData("leadId");
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${CONFIG.API_BASE_URL}/api/leads/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ status: newStatus })
+      });
+      if (res.ok) fetchLeads();
+    } catch (err) { console.error('Error updating status:', err); }
+  }
+
+  function getPriorityColor(p) {
+    if (p === 'Hot') return 'text-red-500';
+    if (p === 'Warm') return 'text-orange-400';
+    return 'text-blue-400';
+  }
+
+  function setQuickFilter(type) {
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(`btn-${type}`).classList.add('active');
+
+    if (type === 'all') filters = {};
+    else if (type === 'open') filters = { converted: 'false' };
+    else if (type === 'lost') filters = { status: 'Lost' };
+    fetchLeads();
+  }
+
+  async function deleteLead(id) {
+    if (!confirm('Are you sure you want to delete this lead?')) return;
+    try {
+      const token = localStorage.getItem('token');
+      await fetch(`${CONFIG.API_BASE_URL}/api/leads/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      fetchLeads();
+    } catch (err) { console.error(err); }
+  }
+
+  document.getElementById('filterForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    filters = {
+      status: document.getElementById('filterStatus').value,
+      priority: document.getElementById('filterPriority').value,
+      source: document.getElementById('filterSource').value,
+      minBudget: document.getElementById('filterMinBudget').value,
+      maxBudget: document.getElementById('filterMaxBudget').value,
+      startDate: document.getElementById('filterStartDate').value,
+      endDate: document.getElementById('filterEndDate').value,
+      assignedTo: document.getElementById('filterAssignedTo').value,
+      converted: document.getElementById('filterConverted').value,
+      followUpPending: document.getElementById('filterFollowUpPending').checked
+    };
+    fetchLeads();
+    closeAllPanels();
+  });
+
+  function resetFilters() {
+    document.getElementById('filterForm').reset();
+    filters = {};
+    fetchLeads();
+    closeAllPanels();
+  }
+
+  document.getElementById('addLeadForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const phone = document.getElementById('leadPhone').value;
+    const whatsapp = document.getElementById('leadWhatsapp').value;
+
+    // Improved Regex for phone number validation (10-15 digits)
+    const phoneRegex = /^\+?[\d\s-]{10,15}$/;
+
+    if (phone && !phoneRegex.test(phone)) {
+      alert('Please enter a valid 10-15 digit mobile number (e.g. +91 9876543210)');
+      document.getElementById('leadPhone').focus();
+      return;
+    }
+
+    if (whatsapp && !phoneRegex.test(whatsapp)) {
+      alert('Please enter a valid 10-15 digit WhatsApp number');
+      document.getElementById('leadWhatsapp').focus();
+      return;
+    }
+
+    let source = document.getElementById('leadSource').value;
+    if (source === 'Other') source = document.getElementById('leadSourceOther').value || 'Other';
+
+    let businessType = document.getElementById('leadBusinessType').value;
+    if (businessType === 'Other') businessType = document.getElementById('leadBusinessTypeOther').value || 'Other';
+
+    const assignedToVal = document.getElementById('leadAssignedTo').value;
+   // =========================
+// REPLACE THIS INSIDE addLeadForm submit
+// =========================
+
+const data = {
+  name: document.getElementById('leadName').value,
+  company: document.getElementById('leadCompany').value,
+  companyId: document.getElementById('leadCompanyId').value || undefined,
+  email: document.getElementById('leadEmail').value,
+  address: document.getElementById('leadAddress').value,
+  phone: phone,
+  whatsapp: whatsapp,
+  source: source,
+  businessType: businessType,
+  budget: document.getElementById('leadBudget').value,
+  priority: document.getElementById('leadPriority').value,
+  status: document.getElementById('leadStatus').value,
+  followUpDate: document.getElementById('leadFollowUpDate').value,
+  requirement: document.getElementById('leadRequirement').value,
+  notes: document.getElementById('leadNotes').value,
+  assignedTo: assignedToVal && assignedToVal !== "" ? assignedToVal : undefined
+};
+
+    try {
+      const token = localStorage.getItem('token');
+      const url = editingLeadId
+        ? `${CONFIG.API_BASE_URL}/api/leads/${editingLeadId}`
+        : `${CONFIG.API_BASE_URL}/api/leads`;
+      const method = editingLeadId ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method: method,
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(data)
+      });
+      if (res.ok) {
+        toggleModal('leadModal');
+        document.getElementById('addLeadForm').reset();
+        document.getElementById('leadSourceOther').classList.add('hidden');
+        document.getElementById('leadBusinessTypeOther').classList.add('hidden');
+        editingLeadId = null;
+        fetchLeads();
+      } else {
+        const errData = await res.json();
+        alert('Error: ' + (errData.msg || errData.message || 'Validation failed'));
+      }
+    } catch (err) {  console.error("SAVE LEAD ERROR:", err);
+  alert(err.message || 'Error saving lead'); }
+  });
+
+  function switchView(view) {
+    currentView = view;
+    const tableBtn = document.getElementById('tableBtn');
+    const kanbanBtn = document.getElementById('kanbanBtn');
+    const tableView = document.getElementById('tableView');
+    const kanbanView = document.getElementById('kanbanView');
+
+    if (view === 'table') {
+      tableBtn.classList.add('bg-white/10', 'text-white');
+      tableBtn.classList.remove('text-gray-500');
+      kanbanBtn.classList.remove('bg-white/10', 'text-white');
+      kanbanBtn.classList.add('text-gray-500');
+      tableView.classList.remove('hidden');
+      kanbanView.classList.add('hidden');
+    } else {
+      kanbanBtn.classList.add('bg-white/10', 'text-white');
+      kanbanBtn.classList.remove('text-gray-500');
+      tableBtn.classList.remove('bg-white/10', 'text-white');
+      tableBtn.classList.add('text-gray-500');
+      kanbanView.classList.remove('hidden');
+      tableView.classList.add('hidden');
+    }
+    renderCurrentView();
+  }
+
+  function toggleColumn(index) {
+    const table = document.querySelector('table');
+    if (!table) return;
+    const rows = table.rows;
+    for (let i = 0; i < rows.length; i++) {
+      const cell = rows[i].cells[index];
+      if (cell) cell.classList.toggle('hidden');
+    }
+    updateVisibleCount();
+  }
+
+  function applyColumnVisibility() {
+    const checkboxes = document.querySelectorAll('#columnToggleList input[type="checkbox"]');
+    checkboxes.forEach((cb, index) => {
+      const table = document.querySelector('table');
+      if (!table) return;
+      const rows = table.rows;
+      for (let i = 0; i < rows.length; i++) {
+        const cell = rows[i].cells[index];
+        if (cell) {
+          if (!cb.checked) cell.classList.add('hidden');
+          else cell.classList.remove('hidden');
+        }
+      }
+    });
+    updateVisibleCount();
+  }
+
+  function updateVisibleCount() {
+const total = 16;
+    const hidden = document.querySelectorAll('thead th.hidden').length;
+    document.getElementById('colCount').innerText = `${total - hidden}/${total}`;
+  }
+
+  fetchEmployees();
+  checkSuperAdmin();
+  fetchLeads();
+  feather.replace();
+</script>
+</body>
+</html>
