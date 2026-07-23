@@ -109,19 +109,59 @@
     feather.replace();
     let currentPricing = [];
 
+    // Initialize with cached data for instant display
+    function initPricing() {
+        const cachedData = localStorage.getItem('cachedPricingData');
+        if (cachedData) {
+            try {
+                const pricingData = JSON.parse(cachedData);
+                renderPricing(pricingData);
+                console.log("Loaded pricing from cache");
+            } catch (e) {
+                console.error("Error parsing cached pricing", e);
+            }
+        }
+        fetchPricing();
+    }
+
     async function fetchPricing() {
       try {
         const res = await fetch(CONFIG.API_BASE_URL + '/api/pricing');
+        if (!res.ok) throw new Error('Failed to fetch from API');
+
         let pricingData = await res.json();
 
+        // Save to cache for next time
+        localStorage.setItem('cachedPricingData', JSON.stringify(pricingData));
+
+        renderPricing(pricingData);
+      } catch (err) {
+        console.error('Error fetching pricing:', err);
+        // If fetch fails and no cache, show error
+        const container = document.getElementById('pricing-cards-container');
+        if (container.innerHTML.includes('animate-spin')) {
+            container.innerHTML = `
+                <div class="col-span-3 text-center py-20">
+                    <p class="text-red-400 font-bold uppercase tracking-widest text-xs">Failed to load pricing plans. Please try again later.</p>
+                </div>
+            `;
+        }
+      }
+    }
+
+    function renderPricing(pricingData) {
+        if (!Array.isArray(pricingData)) return;
+
         // Subscription Tiers (Exclude special setup tiers)
-        const subTiers = pricingData.filter(d => !d.tier.startsWith('SETUP_'));
+        const subTiers = pricingData.filter(d => d.tier && !d.tier.startsWith('SETUP_'));
 
         // Order: Basic, Growth, Pro (Puts Growth in the middle)
         const preferredOrder = ['Basic', 'Growth', 'Pro'];
         currentPricing = subTiers.sort((a, b) => preferredOrder.indexOf(a.tier) - preferredOrder.indexOf(b.tier));
 
         const container = document.getElementById('pricing-cards-container');
+        if (!container) return;
+
         container.innerHTML = '';
 
         currentPricing.forEach(plan => {
@@ -138,16 +178,16 @@
             <div class="${cardClass}">
               ${isMostPopular ? '<div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-yellow-400 text-black text-[10px] font-black px-6 py-1.5 rounded-full shadow-lg flex items-center uppercase tracking-[0.2em]"><i data-feather="zap" class="w-3 h-3 mr-2 fill-current"></i> Most Popular</div>' : ''}
               <h3 class="${titleClass}">${plan.tier}</h3>
-              <p class="text-xs text-gray-500 mb-4 uppercase tracking-widest font-semibold">Up to ${plan.usersLimit} Users</p>
+              <p class="text-xs text-gray-500 mb-4 uppercase tracking-widest font-semibold">Up to ${plan.usersLimit || 0} Users</p>
               <div class="mb-6">
                 <div class="flex items-baseline">
-                  <span class="text-5xl font-black text-white price-val" data-usd="${plan.usd}" data-inr="${plan.inr}">₹${plan.inr.toLocaleString()}</span>
+                  <span class="text-5xl font-black text-white price-val" data-usd="${plan.usd || 0}" data-inr="${plan.inr || 0}">₹${(plan.inr || 0).toLocaleString()}</span>
                   <span class="text-gray-500 ml-2 font-bold uppercase text-[10px]">/month</span>
                 </div>
-                <p class="text-[10px] text-gray-600 mt-1 font-bold price-approx">(≈ $${plan.usd} USD)</p>
+                <p class="text-[10px] text-gray-600 mt-1 font-bold price-approx">(≈ $${plan.usd || 0} USD)</p>
               </div>
               <ul class="space-y-4 mb-8">
-                ${plan.features.map(f => `
+                ${(plan.features || []).map(f => `
                   <li class="flex items-center text-xs font-bold uppercase tracking-widest text-gray-400">
                     <i data-feather="check-circle" class="w-4 h-4 mr-3 ${checkColor}"></i> ${f}
                   </li>
@@ -181,9 +221,6 @@
         const savedCurrency = localStorage.getItem('selectedCurrency') || 'INR';
         setCurrency(savedCurrency);
         feather.replace();
-      } catch (err) {
-        console.error('Error fetching pricing:', err);
-      }
     }
 
     function setCurrency(currency) {
@@ -231,7 +268,7 @@
       }
     }
 
-    fetchPricing();
+    initPricing();
   </script>
 
     <!-- Enterprise Multi-Column Footer -->

@@ -1,8 +1,8 @@
 const CONFIG = {
-    // FORCE RELATIVE PATHS TO PREVENT CORS AND CACHE ISSUES
+    // Dynamically set API URL based on environment
     API_BASE_URL: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
         ? 'http://localhost:5000'
-        : 'https://velvorax-alkc.onrender.com'
+        : window.location.origin
 };
 
 window.CONFIG = CONFIG;
