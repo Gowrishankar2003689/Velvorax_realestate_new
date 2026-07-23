@@ -1,47 +1,304 @@
 # Velvorax Full-Stack Platform
 
-A high-performance business automation platform, CRM, and scaling solution.
+A high-performance Business Automation, CRM, and Business Scaling Platform built with Node.js, Express, MongoDB, and a modern responsive frontend.
 
-## Features
-- Complete Dark/Gold aesthetic UI with Glassmorphism
-- Marketing Pages: Home, Features (Mermaid.js workflow), Services, Pricing
-- Internal CRM Dashboard: Metrics, Charts, Leads Management, Employee Tracking, Calling, Invoices, Settings
-- Secure Backend: Node.js + Express + MongoDB + JWT Authentication
-- Responsive and Dynamic components
+---
 
-## Tech Stack
-- Frontend: HTML5, Tailwind CSS, Vanilla JS, Chart.js, Mermaid.js
-- Backend: Node.js, Express, MongoDB (Mongoose), JSON Web Tokens
+## 🚀 Features
 
-## Setup Instructions
+### Marketing Website
+- Modern Dark & Gold UI
+- Glassmorphism Design
+- Responsive Layout
+- Home Page
+- Features Page
+- Services
+- Pricing
+- Contact
 
-### 1. Backend Setup
-1. Open a terminal and navigate to the `backend` folder:
-   ```bash
-   cd backend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Ensure MongoDB is running locally (or update `.env` with your MongoDB URI).
-4. Run the seed script to populate the database with a demo admin account and sample data:
-   ```bash
-   node seed.js
-   ```
-5. Start the backend server:
-   ```bash
-   node server.js
-   ```
-   *The server will run on port 5000.*
+### CRM Dashboard
+- User Authentication
+- Super Admin Dashboard
+- Employee Management
+- Lead Management
+- Deal Management
+- Company Management
+- Task Management
+- Ticket Management
+- Case Management
+- Partner Management
+- Account Management
+- Blog Management
+- Reports & Analytics
+- AI Email Integration
+- Chat Module
+- Dashboard Metrics
+- Charts & Analytics
+- Role-Based Access Control
 
-### 2. Frontend Setup
-1. Open the `frontend` folder.
-2. Open `index.html` in your web browser. (You can also use Live Server in VS Code).
-3. To access the CRM, go to the **Login** page and use the following seeded credentials:
-   - **Email:** admin@velvorax.com
-   - **Password:** Admin123
+---
 
-## Notes
-- Ensure the backend server is running while testing the dashboard, as it fetches data via REST API.
-# Velvo
+## 🛠 Tech Stack
+
+### Frontend
+- HTML5
+- CSS3
+- Tailwind CSS
+- JavaScript (Vanilla)
+- Chart.js
+- Mermaid.js
+
+### Backend
+- Node.js
+- Express.js
+- MongoDB Atlas
+- Mongoose
+- JWT Authentication
+- CORS
+- Dotenv
+
+### Deployment
+- PM2
+- Git
+- GitHub
+- Linux Server
+
+---
+
+## 📁 Project Structure
+
+```
+Velvorax/
+│
+├── backend/
+│   ├── controllers/
+│   ├── middleware/
+│   ├── models/
+│   ├── routes/
+│   ├── services/
+│   ├── utils/
+│   ├── uploads/
+│   ├── server.js
+│   ├── seed.js
+│   └── package.json
+│
+├── frontend/
+│   ├── index.html
+│   ├── login.html
+│   ├── css/
+│   ├── js/
+│   └── assets/
+│
+├── README.md
+└── .gitignore
+```
+
+---
+
+# ⚙ Backend Setup
+
+Clone the repository
+
+```bash
+git clone https://github.com/infovelvorax/Velvorax.git
+```
+
+Go to the project
+
+```bash
+cd Velvorax
+```
+
+Install backend dependencies
+
+```bash
+cd backend
+npm install
+```
+
+Create a `.env` file inside the `backend` directory.
+
+Example:
+
+```env
+PORT=5000
+
+MONGO_URI=your_mongodb_connection_string
+
+JWT_SECRET=your_jwt_secret
+
+EMAIL_USER=your_email
+
+EMAIL_PASS=your_email_password
+```
+
+Populate the database
+
+```bash
+node seed.js
+```
+
+Start the backend
+
+```bash
+node server.js
+```
+
+The server runs on:
+
+```
+http://localhost:5000
+```
+
+---
+
+# 💻 Frontend Setup
+
+Open the frontend folder.
+
+```text
+frontend/
+```
+
+Open
+
+```
+index.html
+```
+
+using your browser or VS Code Live Server.
+
+---
+
+# 🔑 Default Login
+
+```
+Email:
+info.velvorax@gmail.com
+
+Password:
+Admin@123
+```
+
+---
+
+# 🚀 Deployment
+
+## Push Code
+
+```bash
+git add .
+git commit -m "Updated project"
+git push origin main
+```
+
+## Server Deployment
+
+Login
+
+```bash
+ssh developer@<SERVER_IP>
+```
+
+Navigate to the project
+
+```bash
+cd /var/www/app
+```
+
+Update code
+
+```bash
+git fetch origin
+git reset --hard origin/main
+```
+
+Install dependencies
+
+```bash
+cd backend
+npm install
+```
+
+Restart application
+
+```bash
+pm2 restart all
+```
+
+View logs
+
+```bash
+pm2 logs server
+```
+
+---
+
+# 🌐 Production URL
+
+```
+https://crm.velvorax.tech
+```
+
+---
+
+# 📂 Repository
+
+```
+https://github.com/infovelvorax/Velvorax
+```
+
+---
+
+# 📦 Environment Variables
+
+Example:
+
+```env
+PORT=5000
+
+MONGO_URI=your_mongodb_connection_string
+
+JWT_SECRET=your_secret_key
+
+EMAIL_USER=your_email
+
+EMAIL_PASS=your_password
+```
+
+---
+
+# 📊 Technologies Used
+
+- HTML5
+- CSS3
+- Tailwind CSS
+- JavaScript
+- Node.js
+- Express.js
+- MongoDB Atlas
+- Mongoose
+- JWT
+- Chart.js
+- Mermaid.js
+- PM2
+- Git
+- GitHub
+
+---
+
+# 📝 Notes
+
+- Ensure MongoDB Atlas is accessible before starting the backend.
+- The backend must be running for login and dashboard features.
+- Keep the `.env` file out of Git for security.
+- Use PM2 for production deployments.
+- Restart PM2 after updating the project or environment variables.
+
+---
+
+# 📄 License
+
+This project is developed for **Velvorax**.
+
+**© Velvorax. All Rights Reserved.**
