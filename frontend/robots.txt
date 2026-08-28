@@ -1,0 +1,28 @@
+User-agent: *
+# Allow all public content
+Allow: /
+
+# Block login and account areas
+Disallow: /login
+Disallow: /login.html
+Disallow: /dashboard/
+Disallow: /admin/
+Disallow: /account/
+
+# Block internal search pages
+Disallow: /search/
+Disallow: /*?s=
+
+# Block URL parameters that create duplicate content
+Disallow: /*?utm_
+Disallow: /*?fbclid=
+Disallow: /*?gclid=
+
+# Allow assets required for rendering
+Allow: /assets/
+Allow: /images/
+Allow: /css/
+Allow: /js/
+
+# Sitemap
+Sitemap: https://velvorax.tech/sitemap.xml
