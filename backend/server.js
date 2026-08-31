@@ -61,6 +61,11 @@ const employeeRoutes = require('./routes/employee');
 const blogRoutes = require('./routes/blogs');
 const aiEmailRoutes = require('./routes/ai-email');
 const chatRoutes = require('./routes/chat');
+const paymentRoutes = require('./routes/payment');
+const invoiceRoutes = require('./routes/invoices');
+const recurringRoutes = require('./routes/recurring');
+const productRoutes = require('./routes/products');
+const opportunityRoutes = require('./routes/opportunities');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -108,6 +113,11 @@ app.use('/api/accounts', accountRoutes);
 app.use('/api/employee', employeeRoutes);
 app.use('/api', aiEmailRoutes);
 app.use('/api', chatRoutes);
+app.use('/api/payment', paymentRoutes);
+app.use('/api/invoices', invoiceRoutes);
+app.use('/api/recurring', recurringRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/opportunities', opportunityRoutes);
 
 // Serve static files from the frontend folder
 app.use(express.static(path.join(__dirname, '../frontend'), { extensions: ['html'] }));

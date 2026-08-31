@@ -10,6 +10,10 @@ const Notification = require('./Notification');
 const PromptUsage = require('./PromptUsage');
 const DailyReport = require('./DailyReport');
 const Pricing = require('./Pricing');
+const Invoice = require('./Invoice');
+const RecurringInvoice = require('./RecurringInvoice');
+const Product = require('./Product');
+const Opportunity = require('./Opportunity');
 
 // Internal CRM users (admin/staff)
 const User = require('./User');
@@ -30,6 +34,10 @@ module.exports = {
   PromptUsage,
   DailyReport,
   Pricing,
+  Invoice,
+  RecurringInvoice,
+  Product,
+  Opportunity,
   User,
   StandardUser
 };

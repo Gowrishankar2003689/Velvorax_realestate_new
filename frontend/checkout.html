@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="css/style.css">
   <script src="https://unpkg.com/feather-icons"></script>
   <script src="js/config.js"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <style>
     .plan-card {
       background: rgba(255, 255, 255, 0.02);
@@ -296,9 +297,77 @@
     // Initialize
     setCurrency(currentCurrency);
 
-    document.getElementById('pay-btn').onclick = function() {
-      const amount = currentCurrency === 'INR' ? activePlanElement.dataset.inr : activePlanElement.dataset.usd;
-      alert(`Redirecting to Razorpay for ${activePlanElement.dataset.plan}...\n\nTotal: ${currentCurrency} ${amount}`);
+    document.getElementById('pay-btn').onclick = async function() {
+      const btn = this;
+      const originalText = btn.innerHTML;
+
+      try {
+        const amount = currentCurrency === 'INR' ? activePlanElement.dataset.inr : activePlanElement.dataset.usd;
+        const plan = activePlanElement.dataset.plan;
+
+        btn.disabled = true;
+        btn.innerHTML = '<i data-feather="loader" class="w-5 h-5 animate-spin mx-auto"></i>';
+        if(window.feather) feather.replace();
+
+        // 1. Create order on backend
+        const response = await fetch(CONFIG.API_BASE_URL + '/api/payment/create-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount, currency: currentCurrency, plan })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) throw new Error(data.msg || 'Failed to create order');
+
+        // 2. Open Razorpay Checkout
+        const options = {
+          key: data.key,
+          amount: data.amount,
+          currency: data.currency,
+          name: "Velvorax Software",
+          description: "Subscription for " + plan,
+          image: "assets/logo.jpg",
+          order_id: data.orderId,
+          handler: async function (response) {
+            // 3. Verify payment on backend
+            const verifyRes = await fetch(CONFIG.API_BASE_URL + '/api/payment/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature
+              })
+            });
+
+            const verifyData = await verifyRes.json();
+            if (verifyData.success) {
+              alert('Payment Successful! Transaction ID: ' + response.razorpay_payment_id);
+              window.location.href = 'dashboard.html';
+            } else {
+              alert('Payment verification failed: ' + verifyData.msg);
+            }
+          },
+          prefill: {
+            name: "", // Can be filled if user is logged in
+            email: "",
+            contact: ""
+          },
+          theme: { color: "#FFD700" }
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.open();
+
+      } catch (err) {
+        console.error(err);
+        alert('Error: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+        if(window.feather) feather.replace();
+      }
     };
   </script>
 </body>
