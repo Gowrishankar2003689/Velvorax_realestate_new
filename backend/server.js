@@ -66,6 +66,8 @@ const invoiceRoutes = require('./routes/invoices');
 const recurringRoutes = require('./routes/recurring');
 const productRoutes = require('./routes/products');
 const opportunityRoutes = require('./routes/opportunities');
+const realEstateRoutes = require('./modules/realestate/routes');
+const realEstateMySqlRoutes = require('./modules/realestate/mysql-routes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -118,6 +120,8 @@ app.use('/api/invoices', invoiceRoutes);
 app.use('/api/recurring', recurringRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/opportunities', opportunityRoutes);
+app.use('/api/realestate/v1', realEstateRoutes);
+app.use('/api/realestate/mysql', realEstateMySqlRoutes);
 
 // Serve static files from the frontend folder
 app.use(express.static(path.join(__dirname, '../frontend'), { extensions: ['html'] }));

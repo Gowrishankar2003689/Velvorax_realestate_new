@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Real Estate Command Center | Velvorax</title>
+  <link rel="icon" href="../assets/logo.jpg" type="image/jpeg">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="realestate.css">
+  <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body>
+  <div class="realestate-shell">
+    <aside class="realestate-sidebar">
+      <a class="brand" href="../dashboard.html">
+        <img src="../assets/logo.jpg" alt="" class="brand-logo">
+        <span><strong>Velvorax</strong><small>REAL ESTATE CRM</small></span>
+      </a>
+
+      <div class="workspace-label">CRM MODULES</div>
+      <nav class="module-nav crm-module-nav" aria-label="CRM modules">
+        <a class="module-link" href="../dashboard.html" target="_top"><i data-feather="grid"></i> Dashboard</a>
+        <a class="module-link" href="../leads.html" target="_top"><i data-feather="users"></i> Leads</a>
+        <a class="module-link" href="../contacts.html" target="_top"><i data-feather="user"></i> Contacts</a>
+        <a class="module-link" href="../opportunities.html" target="_top"><i data-feather="target"></i> Deals</a>
+        <a class="module-link" href="../accounts.html" target="_top"><i data-feather="briefcase"></i> Accounts</a>
+        <a class="module-link" href="../partners.html" target="_top"><i data-feather="share-2"></i> Partners</a>
+        <a class="module-link" href="../tasks.html" target="_top"><i data-feather="check-square"></i> Tasks</a>
+        <a class="module-link" href="../cases.html" target="_top"><i data-feather="life-buoy"></i> Tickets</a>
+        <a class="module-link" href="../invoices.html" target="_top"><i data-feather="file-text"></i> Invoices</a>
+        <a class="module-link" href="../reports.html" target="_top"><i data-feather="bar-chart-2"></i> Reports</a>
+        <a class="module-link" href="../employee_tracking.html" target="_top"><i data-feather="activity"></i> Analytics</a>
+        <a class="module-link" href="../admin_pricing.html" target="_top"><i data-feather="dollar-sign"></i> Pricing Plan</a>
+        <a class="module-link" href="../settings.html" target="_top"><i data-feather="settings"></i> Settings</a>
+      </nav>
+
+      <div class="workspace-label">REAL ESTATE WORKSPACE</div>
+      <nav class="module-nav" aria-label="Real estate modules">
+        <button class="module-link active" type="button" data-view="dashboard"><i data-feather="grid"></i> Dashboard</button>
+        <button class="module-link" type="button" data-view="projects"><i data-feather="map"></i> Projects &amp; Inventory</button>
+        <button class="module-link" type="button" data-view="properties"><i data-feather="home"></i> Properties / Units</button>
+        <button class="module-link" type="button" data-view="leads"><i data-feather="users"></i> Leads &amp; Enquiries</button>
+        <button class="module-link" type="button" data-view="contacts"><i data-feather="user"></i> Contacts</button>
+        <button class="module-link" type="button" data-view="visits"><i data-feather="calendar"></i> Site Visits</button>
+        <button class="module-link" type="button" data-view="negotiations"><i data-feather="git-merge"></i> Negotiations</button>
+        <button class="module-link" type="button" data-view="bookings"><i data-feather="bookmark"></i> Bookings</button>
+        <button class="module-link" type="button" data-view="payments"><i data-feather="credit-card"></i> Payments</button>
+        <button class="module-link" type="button" data-view="partners"><i data-feather="briefcase"></i> Channel Partners</button>
+        <button class="module-link" type="button" data-view="followups"><i data-feather="bell"></i> Follow-ups</button>
+        <button class="module-link" type="button" data-view="hotleads"><i data-feather="thermometer"></i> Hot Leads</button>
+        <button class="module-link" type="button" data-view="reports"><i data-feather="bar-chart-2"></i> Reports</button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <span class="demo-dot"></span>
+        MySQL live workspace
+        <a href="../dashboard.html">Back to CRM Dashboard</a>
+      </div>
+    </aside>
+
+    <main class="realestate-main">
+      <header class="topbar">
+        <div class="topbar-title">
+          <span class="eyebrow">VELVORAX / INDUSTRY MODULE</span>
+          <h1 id="pageTitle">Real Estate Dashboard</h1>
+        </div>
+        <div class="topbar-actions">
+          <span class="demo-badge"><span class="demo-dot"></span> MYSQL DATA · SAVED</span>
+          <button id="reNewButton" class="re-new-button" type="button" hidden>+ New</button>
+          <div class="avatar" aria-label="Demo workspace">DW</div>
+        </div>
+      </header>
+
+      <section id="viewRoot" class="view-root" aria-live="polite"></section>
+
+      <footer class="module-footer">
+        <span>VELVORAX REAL ESTATE CRM</span>
+        <a href="ARCHITECTURE.md">Review data model, API plan &amp; permissions</a>
+      </footer>
+    </main>
+  </div>
+  <script src="realestate-crud.js?v=1"></script>
+  <script src="realestate-live.js?v=1"></script>
+</body>
+</html>

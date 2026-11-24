@@ -20,7 +20,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="css/style.css">
   <script src="https://unpkg.com/feather-icons"></script>
-  <script src="js/api-config.js"></script>
 </head>
 <body class="antialiased flex flex-col min-h-screen">
 
@@ -42,23 +41,14 @@
         <div id="errorMsg" class="text-red-500 text-sm hidden text-center bg-red-500/10 p-2 rounded"></div>
         
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-2">Access Level</label>
-          <select id="roleSelection" class="w-full bg-gray-900 border border-gray-700 rounded-md py-2 px-3 text-white focus:outline-none focus:border-yellow-400">
-            <option value="super_admin">Super Admin</option>
-            <option value="client">Business Client</option>
-            <option value="staff">Standard User</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
-          <input type="email" id="email" required placeholder="admin@velvorax.com" class="w-full bg-gray-900 border border-gray-700 rounded-md py-2 px-3 text-white focus:outline-none focus:border-yellow-400">
+          <label class="block text-sm font-medium text-gray-300 mb-2">Username</label>
+          <input type="text" id="email" required placeholder="gowri@123" value="gowri@123" autocomplete="username" class="w-full bg-gray-900 border border-gray-700 rounded-md py-2 px-3 text-white focus:outline-none focus:border-yellow-400">
         </div>
 
         <div>
           <label class="block text-sm font-medium text-gray-300 mb-2">Password</label>
           <div class="relative">
-            <input type="password" id="password" required placeholder="••••••••" class="w-full bg-gray-900 border border-gray-700 rounded-md py-2 px-3 pr-10 text-white focus:outline-none focus:border-yellow-400">
+            <input type="password" id="password" required placeholder="••••••••" value="123" autocomplete="current-password" class="w-full bg-gray-900 border border-gray-700 rounded-md py-2 px-3 pr-10 text-white focus:outline-none focus:border-yellow-400">
             <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-yellow-400 transition-colors">
               <i data-feather="eye" id="eyeIcon" class="w-4 h-4"></i>
             </button>
@@ -75,7 +65,7 @@
 
         <button type="button" id="clearSessionsBtn" class="w-full bg-white/5 border border-white/10 text-gray-400 hover:text-yellow-400 py-3 mt-2 rounded-xl text-xs uppercase tracking-widest font-bold transition-all flex justify-center items-center gap-2 group">
           <i data-feather="refresh-cw" class="w-3 h-3 group-hover:rotate-180 transition-transform duration-500"></i>
-          Logout from all sessions
+          Clear local session
         </button>
 
 
@@ -90,7 +80,7 @@
     <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20 pointer-events-none"></div>
   </main>
 
-  <script src="js/auth.js"></script>
+  <script src="js/auth.js?v=static-login-20261121"></script>
   <script>
     feather.replace();
 
@@ -141,62 +131,32 @@
         const errorMsg =
           document.getElementById('errorMsg');
 
-        const selectedRole =
-          document.getElementById('roleSelection').value;
-
         const result = await VelvoraxAuth.login(
           email,
-          password,
-          selectedRole
+          password
         );
 
-        console.log(result);
-
         if (result.success) {
-
-          const roleFromServer =
-            result.user?.role;
-
-          if (roleFromServer === 'super_admin') {
-
-            window.location.href =
-              'dashboard-super.html';
-
-          } else {
-
-            // CLIENT + STAFF
-            window.location.href =
-              'dashboard-client.html';
-
-          }
+          window.location.href = 'dashboard.html';
 
         } else {
 
           errorMsg.textContent =
             result.message;
 
-          errorMsg.classList.remove('hidden');
+          errorMsg.classList.remove('hidden', 'bg-green-500/10', 'text-green-500', 'bg-yellow-500/10', 'text-yellow-500');
+          errorMsg.classList.add('bg-red-500/10', 'text-red-500');
 
         }
 
       });
 
     document.getElementById('clearSessionsBtn').addEventListener('click', async () => {
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        const selectedRole = document.getElementById('roleSelection').value;
         const errorMsg = document.getElementById('errorMsg');
 
-        if (!email || !password) {
-            errorMsg.textContent = "Please enter your email and password first.";
-            errorMsg.classList.remove('hidden', 'bg-red-500/10', 'text-red-500');
-            errorMsg.classList.add('bg-yellow-500/10', 'text-yellow-500');
-            return;
-        }
+        if (!confirm("Clear the saved login for this browser?")) return;
 
-        if (!confirm("This will log you out of all other devices. Proceed?")) return;
-
-        const result = await VelvoraxAuth.clearSessions(email, password, selectedRole);
+        const result = await VelvoraxAuth.clearSessions();
 
         errorMsg.textContent = result.message;
         errorMsg.classList.remove('hidden', 'bg-red-500/10', 'text-red-500', 'bg-yellow-500/10', 'text-yellow-500');

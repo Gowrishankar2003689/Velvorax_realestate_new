@@ -24,7 +24,21 @@
       window.location.href = 'login.html';
     }
   </script>
-<  <style>
+  <style>
+    #mainSidebarNav {
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 215, 0, 0.3) transparent;
+    }
+    #mainSidebarNav::-webkit-scrollbar { width: 6px; }
+    #mainSidebarNav::-webkit-scrollbar-thumb {
+      border-radius: 6px;
+      background: rgba(255, 215, 0, 0.3);
+    }
+    #mainSidebarNav::-webkit-scrollbar-track { background: transparent; }
     .sidebar-link {
       display: flex;
       align-items: center;
@@ -51,6 +65,49 @@
       border: 1px solid rgba(255, 255, 255, 0.05);
       border-radius: 1.5rem;
     }
+    .module-submenu {
+      display: none;
+      margin: 0.15rem 0.75rem 0.5rem 2.35rem;
+      padding-left: 0.55rem;
+      border-left: 1px solid rgba(255, 215, 0, 0.12);
+    }
+    .module-submenu.open { display: grid; gap: 0.1rem; }
+    .module-submenu-link {
+      display: flex;
+      align-items: center;
+      min-height: 2.25rem;
+      padding: 0.45rem 0.65rem;
+      border: 0;
+      border-radius: 0.55rem;
+      background: transparent;
+      color: #767b86;
+      font-size: 0.68rem;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .module-submenu-link:hover,
+    .module-submenu-link.active {
+      background: rgba(255, 215, 0, 0.06);
+      color: #FFD700;
+    }
+    .module-submenu-link i { width: 13px; height: 13px; margin-right: 0.55rem; }
+    #moduleContent {
+      display: none;
+      min-height: 0;
+      flex: 1;
+      overflow-y: auto;
+      background: #02020a;
+    }
+    #moduleContent.active { display: block; }
+    #moduleContent.module-realestate { padding: 0; }
+    #moduleContent .module-loaded-main {
+      width: 100%;
+      min-width: 0;
+      min-height: 100%;
+    }
+    #appMain.module-open #dashboardHome,
+    #appMain.module-open #dashboardFooter { display: none; }
   </style>
   <script src="js/api-config.js"></script>
 </head>
@@ -67,19 +124,35 @@
         </div>
       </a>
     </div>
-    <nav class="flex-1 px-3 space-y-1">
-      <a href="dashboard.html" class="sidebar-link active"><i data-feather="grid" class="w-4 h-4 mr-3"></i> Dashboard</a>
-      <a href="leads.html" class="sidebar-link"><i data-feather="users" class="w-4 h-4 mr-3"></i> Leads</a>
-      <a href="admin_pricing.html" class="sidebar-link"><i data-feather="dollar-sign" class="w-4 h-4 mr-3"></i> Pricing Plan</a>
+    <nav id="mainSidebarNav" class="flex-1 px-3 space-y-1">
+      <button type="button" class="sidebar-link w-full active" data-module-page="dashboard"><i data-feather="grid" class="w-4 h-4 mr-3"></i> Dashboard</button>
+      <button type="button" class="sidebar-link w-full" id="realEstateModuleButton" data-module-page="realestate"><i data-feather="home" class="w-4 h-4 mr-3"></i><span class="flex-1 text-left">Real Estate</span><i data-feather="chevron-down" class="w-3 h-3 ml-2"></i></button>
+      <div id="realEstateSubmenu" class="module-submenu" aria-label="Real Estate submodules">
+        <button type="button" class="module-submenu-link active" data-realestate-view="dashboard"><i data-feather="grid"></i>Dashboard</button>
+        <button type="button" class="module-submenu-link" data-realestate-view="projects"><i data-feather="map"></i>Projects &amp; Inventory</button>
+        <button type="button" class="module-submenu-link" data-realestate-view="properties"><i data-feather="home"></i>Properties / Units</button>
+        <button type="button" class="module-submenu-link" data-realestate-view="leads"><i data-feather="users"></i>Leads &amp; Enquiries</button>
+        <button type="button" class="module-submenu-link" data-realestate-view="contacts"><i data-feather="user"></i>Contacts</button>
+        <button type="button" class="module-submenu-link" data-realestate-view="visits"><i data-feather="calendar"></i>Site Visits</button>
+        <button type="button" class="module-submenu-link" data-realestate-view="negotiations"><i data-feather="git-merge"></i>Negotiations</button>
+        <button type="button" class="module-submenu-link" data-realestate-view="bookings"><i data-feather="bookmark"></i>Bookings</button>
+        <button type="button" class="module-submenu-link" data-realestate-view="payments"><i data-feather="credit-card"></i>Payments</button>
+        <button type="button" class="module-submenu-link" data-realestate-view="partners"><i data-feather="briefcase"></i>Channel Partners</button>
+        <button type="button" class="module-submenu-link" data-realestate-view="followups"><i data-feather="bell"></i>Follow-ups</button>
+        <button type="button" class="module-submenu-link" data-realestate-view="hotleads"><i data-feather="thermometer"></i>Hot Leads</button>
+        <button type="button" class="module-submenu-link" data-realestate-view="reports"><i data-feather="bar-chart-2"></i>Reports</button>
+      </div>
+      <button type="button" class="sidebar-link w-full" data-module-page="leads"><i data-feather="users" class="w-4 h-4 mr-3"></i> Leads</button>
+      <button type="button" class="sidebar-link w-full" data-module-page="pricing"><i data-feather="dollar-sign" class="w-4 h-4 mr-3"></i> Pricing Plan</button>
 <!--      <a href="registrations.html" class="sidebar-link"><i data-feather="user-plus" class="w-4 h-4 mr-3"></i> Registrations</a>-->
-      <a href="#" class="sidebar-link"><i data-feather="user" class="w-4 h-4 mr-3"></i> Customers</a>
-      <a href="#" class="sidebar-link"><i data-feather="briefcase" class="w-4 h-4 mr-3"></i> Projects</a>
-      <a href="employee_tracking.html" class="sidebar-link"><i data-feather="activity" class="w-4 h-4 mr-3"></i> Analytics</a>
-      <a href="invoices.html" class="sidebar-link"><i data-feather="file-text" class="w-4 h-4 mr-3"></i> Reports</a>
-      <a href="estimates.html" class="sidebar-link"><i data-feather="briefcase" class="w-4 h-4 mr-3"></i> Estimates</a>
+      <button type="button" class="sidebar-link w-full" data-module-page="customers"><i data-feather="user" class="w-4 h-4 mr-3"></i> Customers</button>
+      <button type="button" class="sidebar-link w-full" data-module-page="projects"><i data-feather="briefcase" class="w-4 h-4 mr-3"></i> Projects</button>
+      <button type="button" class="sidebar-link w-full" data-module-page="analytics"><i data-feather="activity" class="w-4 h-4 mr-3"></i> Analytics</button>
+      <button type="button" class="sidebar-link w-full" data-module-page="reports"><i data-feather="file-text" class="w-4 h-4 mr-3"></i> Reports</button>
+      <button type="button" class="sidebar-link w-full" data-module-page="estimates"><i data-feather="briefcase" class="w-4 h-4 mr-3"></i> Estimates</button>
       <div class="pt-6 pb-2 text-[10px] uppercase text-gray-600 font-bold px-5 tracking-[0.2em]">System</div>
-      <a href="settings.html" class="sidebar-link"><i data-feather="settings" class="w-4 h-4 mr-3"></i> Settings</a>
-      <a href="#" class="sidebar-link"><i data-feather="layers" class="w-4 h-4 mr-3"></i> Integrations</a>
+      <button type="button" class="sidebar-link w-full" data-module-page="settings"><i data-feather="settings" class="w-4 h-4 mr-3"></i> Settings</button>
+      <button type="button" class="sidebar-link w-full" data-module-page="integrations"><i data-feather="layers" class="w-4 h-4 mr-3"></i> Integrations</button>
     </nav>
     <div class="p-6 border-t border-white/5">
       <button onclick="logout()" class="flex items-center w-full px-5 py-3 text-xs font-bold text-gray-500 hover:text-red-400 transition-colors">
@@ -89,7 +162,7 @@
   </aside>
 
   <!-- Main Content -->
-  <main class="flex-1 flex flex-col h-full overflow-hidden">
+  <main id="appMain" class="flex-1 flex flex-col h-full overflow-hidden">
     
     <!-- Topbar -->
     <header class="h-20 border-b border-white/5 bg-[#030308]/50 backdrop-blur-xl flex items-center justify-between px-8 z-20">
@@ -115,8 +188,11 @@
       </div>
     </header>
 
+    <section id="moduleContent" aria-live="polite"></section>
+
+
     <!-- Content -->
-    <div class="flex-1 overflow-y-auto p-8 relative space-y-8">
+    <div id="dashboardHome" class="flex-1 overflow-y-auto p-8 relative space-y-8">
       
       <!-- Primary KPI Grid -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -207,7 +283,7 @@
   
 
 
-  <footer class="mt-auto py-8 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4 opacity-50 hover:opacity-100 transition-opacity">
+  <footer id="dashboardFooter" class="mt-auto py-8 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4 opacity-50 hover:opacity-100 transition-opacity">
     <p class="text-[9px] text-gray-500 uppercase tracking-widest">
       &copy; 2026 Velvorax Enterprise OS. All rights reserved.
     </p>
@@ -227,6 +303,223 @@
     
     const user = JSON.parse(localStorage.getItem('user'));
     if(user) document.getElementById('topUserName').textContent = user.name;
+
+    const appMain = document.getElementById('appMain');
+    const moduleContent = document.getElementById('moduleContent');
+    const realEstateSubmenu = document.getElementById('realEstateSubmenu');
+    const realEstateModuleButton = document.getElementById('realEstateModuleButton');
+    const moduleLinks = Array.from(document.querySelectorAll('[data-module-page]'));
+    const realEstateViewLinks = Array.from(document.querySelectorAll('[data-realestate-view]'));
+    let moduleLoadSequence = 0;
+    let loadingModule = null;
+    const moduleFiles = {
+      dashboard: null,
+      realestate: 'realestate/index.html',
+      leads: 'leads.html',
+      pricing: 'admin_pricing.html',
+      customers: 'contacts.html',
+      projects: 'opportunities.html',
+      analytics: 'employee_tracking.html',
+      reports: 'reports.html',
+      estimates: 'estimates.html',
+      settings: 'settings.html',
+      integrations: 'settings.html'
+    };
+    function selectedRealEstateView() {
+      return new URLSearchParams(window.location.hash.slice(1)).get('view') || 'dashboard';
+    }
+
+    function setActiveRealEstateView(view) {
+      realEstateViewLinks.forEach((link) => {
+        const active = link.dataset.realestateView === view;
+        link.classList.toggle('active', active);
+        if (active) link.setAttribute('aria-current', 'page');
+        else link.removeAttribute('aria-current');
+      });
+    }
+
+    function selectedModuleName() {
+      const route = new URLSearchParams(window.location.hash.slice(1));
+      return route.get('module') || 'dashboard';
+    }
+
+    async function executeInlineScripts(container) {
+      const scripts = Array.from(container.querySelectorAll('script'));
+      for (const oldScript of scripts) {
+        const script = document.createElement('script');
+        for (const attribute of oldScript.attributes) script.setAttribute(attribute.name, attribute.value);
+        script.textContent = oldScript.textContent;
+        oldScript.replaceWith(script);
+        if (script.src) {
+          await new Promise((resolve) => {
+            script.onload = resolve;
+            script.onerror = resolve;
+          });
+        } else {
+          await Promise.resolve();
+        }
+      }
+    }
+
+    async function loadModule(moduleName) {
+      const file = moduleFiles[moduleName];
+      moduleLinks.forEach((link) => {
+        link.classList.toggle('active', link.dataset.modulePage === moduleName);
+      });
+
+      if (moduleName === 'realestate') {
+        realEstateSubmenu.classList.add('open');
+      } else {
+        realEstateSubmenu.classList.remove('open');
+      }
+
+      if (moduleName === 'realestate' && moduleContent.dataset.loadedModule === 'realestate') {
+        appMain.classList.add('module-open');
+        moduleContent.className = 'active module-realestate';
+        const view = selectedRealEstateView();
+        setActiveRealEstateView(view);
+        if (typeof window.activateRealEstateView === 'function') {
+          window.activateRealEstateView(view);
+        }
+        return;
+      }
+
+      if (loadingModule === moduleName) return;
+      const loadSequence = ++moduleLoadSequence;
+      loadingModule = moduleName;
+
+      if (!file) {
+        appMain.classList.remove('module-open');
+        moduleContent.classList.remove('active');
+        moduleContent.innerHTML = '';
+        moduleContent.dataset.loadedModule = '';
+        loadingModule = null;
+        window.location.hash = '';
+        return;
+      }
+
+      appMain.classList.add('module-open');
+      moduleContent.className = `active module-${moduleName}`;
+      moduleContent.dataset.loadedModule = '';
+      moduleContent.innerHTML = '<div class="p-8 text-xs text-gray-500">Loading module...</div>';
+
+      try {
+        const response = await fetch(file, { cache: 'no-store' });
+        if (!response.ok) throw new Error(`Unable to load ${file}`);
+        const html = await response.text();
+        if (loadSequence !== moduleLoadSequence) return;
+        const documentSource = new DOMParser().parseFromString(html, 'text/html');
+        documentSource.querySelectorAll('body > aside, body > .realestate-shell > .realestate-sidebar').forEach((node) => node.remove());
+
+        if (moduleName === 'realestate') {
+          const shell = documentSource.querySelector('.realestate-shell');
+          if (shell) {
+            shell.querySelectorAll('.realestate-sidebar').forEach((node) => node.remove());
+            const main = shell.querySelector('.realestate-main');
+            if (main) main.className = 'module-loaded-main';
+            moduleContent.innerHTML = shell.outerHTML;
+            document.querySelector('link[data-realestate-style]')?.remove();
+            const style = document.createElement('link');
+            style.rel = 'stylesheet';
+            style.href = '/realestate/realestate.css';
+            style.dataset.realestateStyle = 'true';
+            document.head.appendChild(style);
+          } else {
+            moduleContent.innerHTML = documentSource.body.innerHTML;
+          }
+        } else {
+          const body = documentSource.querySelector('body');
+          body?.querySelectorAll('aside, nav.sidebar').forEach((node) => node.remove());
+          moduleContent.innerHTML = body ? body.innerHTML : documentSource.body.innerHTML;
+        }
+
+        if (moduleName === 'realestate') {
+          await new Promise((resolve, reject) => {
+            const crud = document.createElement('script');
+            crud.src = '/realestate/realestate-crud.js?v=live';
+            crud.onload = () => {
+              const live = document.createElement('script');
+              live.src = '/realestate/realestate-live.js?v=live';
+              live.onload = resolve;
+              live.onerror = () => reject(new Error('Unable to load Real Estate scripts'));
+              document.body.appendChild(live);
+            };
+            crud.onerror = () => reject(new Error('Unable to load Real Estate CRUD script'));
+            document.body.appendChild(crud);
+          });
+        } else {
+          await executeInlineScripts(moduleContent);
+        }
+        if (loadSequence !== moduleLoadSequence) return;
+        moduleContent.dataset.loadedModule = moduleName;
+        loadingModule = null;
+        if (moduleName === 'realestate') {
+          const view = selectedRealEstateView();
+          setActiveRealEstateView(view);
+          if (typeof window.activateRealEstateView === 'function') {
+            window.activateRealEstateView(view);
+          }
+        }
+        if (window.feather) feather.replace();
+      } catch (error) {
+        if (loadSequence !== moduleLoadSequence) return;
+        loadingModule = null;
+        moduleContent.dataset.loadedModule = '';
+        moduleContent.innerHTML = `<div class="p-8 text-sm text-red-400">${error.message}</div>`;
+      }
+    }
+
+    realEstateViewLinks.forEach((subLink) => {
+      subLink.addEventListener('click', () => {
+        const view = subLink.dataset.realestateView;
+        const nextHash = `#module=realestate&view=${encodeURIComponent(view)}`;
+        setActiveRealEstateView(view);
+        if (window.location.hash === nextHash) {
+          if (moduleContent.dataset.loadedModule === 'realestate' && typeof window.activateRealEstateView === 'function') {
+            window.activateRealEstateView(view);
+          } else {
+            loadModule('realestate');
+          }
+          return;
+        }
+        window.location.hash = nextHash;
+      });
+    });
+
+    moduleLinks.forEach((link) => {
+      link.addEventListener('click', (event) => {
+        const moduleName = link.dataset.modulePage;
+        if (moduleName === 'realestate') {
+          event.preventDefault();
+          const opening = !realEstateSubmenu.classList.contains('open');
+          realEstateSubmenu.classList.toggle('open', opening);
+          if (!opening) return;
+          const view = selectedModuleName() === 'realestate' ? selectedRealEstateView() : 'dashboard';
+          const nextHash = `#module=realestate&view=${encodeURIComponent(view)}`;
+          if (window.location.hash === nextHash) loadModule('realestate');
+          else window.location.hash = nextHash;
+          return;
+        }
+        event.preventDefault();
+        window.location.hash = moduleName === 'dashboard' ? '' : `module=${encodeURIComponent(moduleName)}`;
+      });
+    });
+
+    window.addEventListener('hashchange', () => {
+      const moduleName = selectedModuleName();
+      if (moduleName === 'realestate') {
+        const view = selectedRealEstateView();
+        realEstateSubmenu.classList.add('open');
+        setActiveRealEstateView(view);
+        if (moduleContent.dataset.loadedModule === 'realestate' && typeof window.activateRealEstateView === 'function') {
+          window.activateRealEstateView(view);
+          return;
+        }
+      }
+      loadModule(moduleName);
+    });
+
+    loadModule(selectedModuleName());
 
     function logout() {
       localStorage.removeItem('token');
