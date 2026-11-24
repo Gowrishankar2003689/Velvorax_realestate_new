@@ -1,0 +1,36 @@
+# Environment secrets
+.env
+.env.*
+!.env.example
+*.env
+password.env
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Database
+*.sqlite3
+db.sqlite3
+
+# Call recordings and media
+media/
+call_recordings/
+*.wav
+*.mp3
+*.m4a
+
+# Node
+node_modules/
+dist/
+
+# AI model files
+*.onnx
+*.bin
+
+# Generated files
+None
+dict
+str
